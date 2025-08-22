@@ -12,6 +12,11 @@ class NodeExporter2Bash(App):
         super().__init__()
         self.static_ip = ""
         self.static_port = ""
+        self.node_data = {"wallet": "N/A", "nodeID": "N/A", "version": "N/A"}
+        self.disk_metrics_data = {"used": "N/A", "available": "N/A", "trash": "N/A"}
+        self.connection_status = False
+        self.background_task = None
+        self.current_tab = None
 
     def compose(self) -> ComposeResult: # Compose the app
         ##### App title and header #####
@@ -25,7 +30,8 @@ class NodeExporter2Bash(App):
         ##### Body #####
         with Horizontal():
             yield Button("Node Exporter Info", id="nodexinfo", variant="primary")
-            yield Button("Node Exporter Info", id="nodeInfo", variant="primary")
+            yield Button("Node Info", id="nodeInfo", variant="primary")
+            yield Button ("Disk Metrics", id="diskmetrics", variant="primary" )
 
         self.popup = self.popup_container() # Popup to configure Node Exporter IP and Port
         self.body = Container(self.popup)
@@ -33,19 +39,22 @@ class NodeExporter2Bash(App):
 
 
         ##### Footer #####
-        author = Static("By W0lf13", id="author")
+        self.status = Static(f"Waiting for connection...")
+        self.status.styles.background = "black"
+        self.status.styles.text_align = "center"
+
+
+        author = Static(f"By W0lf13", id="author")
         author.styles.text_align = "center"
         author.styles.background = "black"
         author.styles.color = "white"
-        yield author
+        yield self.status
+        yield author 
+        
 
-    async def test_connection_to_storj_exporter(self):#Test connection to Node Exporter
-        loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(
-            None, test_connection_to_storj_exporter, self.static_ip, self.static_port
-        )
-
-    async def node_exporter_info_tab(self):# Container for Node Exporter Info Body
+#### TABS ####
+    async def node_exporter_info_tab(self):# Container for Node Exporter Info TAB
+        self.current_tab = "node_exporter_info"
         self.body.remove_children()
         self.body.styles.height = "70%"
         self.body.styles.width = "100%"
@@ -55,14 +64,18 @@ class NodeExporter2Bash(App):
         port_value = self.static_port
 
         #Title Styles
-        title = Static(" ******** Node Exporter Service Info ********", id="title")
+        title = Static(" ******** Node Exporter Service Info ********")
         title.styles.bold = True
         title.styles.text_align = "center"
 
         #Container Elements
-        status = Static(f"\nEstablishing Connection...")
         ip_static = Static(f"IP: {ip_value}")
         port_static = Static(f"Port: {port_value}")
+
+        if self.connection_status:
+            status = Static("ONLINE")
+        else:
+            status = Static("OFFLINE")
 
         info_box = Container(
             title,
@@ -80,43 +93,20 @@ class NodeExporter2Bash(App):
 
         centered_infobox = Center(info_box)
 
+        self.status_static = status
+
         self.body.mount(centered_infobox)
 
-        #Sleep to not block UI
-        await asyncio.sleep(0)
-        connected = await self.test_connection_to_storj_exporter() #Test connection
-        #Update status after connection test
-        status.update(
-            f"\nStatus: {'Online' if connected else 'OFFLINE - Connection to Node Exporter couldnt be established!'}"
-        )
-
-    async def node_info(self): # Container for Node Info Body
-        
+    async def node_info(self): # Container for Node Info TAB
+        self.current_tab = "node_info"
         self.body.remove_children()
         self.body.styles.height = "85%"
         self.body.styles.width = "100%"
 
-        node_info = {
-            "wallet": "N/A",
-            "nodeID": "N/A",
-            "version": "N/A",
-        }
-
-        #Tests connection and get metrics
-        loop = asyncio.get_running_loop()
-        status = await self.test_connection_to_storj_exporter()
-
-        if (status):
-            metrics = await loop.run_in_executor(
-                None, get_storj_metrics, self.static_ip , self.static_port
-            )
-            if (metrics):
-                node_info = await loop.run_in_executor(
-                    None, parse_storj_metrics, metrics
-                )
+        node_info = self.node_data
 
         #Title Styles
-        title = Static(" ******** Node Info ********", id="title")
+        title = Static(" ******** Node Info ********")
         title.styles.bold = True
         title.styles.text_align = "center"
         title.styles.background = "black"
@@ -127,26 +117,129 @@ class NodeExporter2Bash(App):
         wallet_static = Static(f"Wallet: {node_info['wallet']}")
         nodeid_static = Static(f"NodeID: {node_info['nodeID']}")
         version_static = Static(f"Version: {node_info['version']}")
+        quic_static = Static(f"QUIC: {node_info['quic']}")
+
+        
 
         info_container = Container(
-            title,
             wallet_static,
             nodeid_static,
             version_static,
+            quic_static,
         )
 
+        info_container.styles.margin = (1, 2)
+        info_container.styles.padding = (1,2)
+
+        self.body.mount(title)
         self.body.mount(info_container)
 
+    async def disk_metrics(self):
+        #Misc
+        self.current_tab = "disk_metrics"
+        self.body.remove_children()
+        self.body.styles.height = "85%"
+        self.body.styles.width = "100%"
+
+        disk_metrics = self.disk_metrics_data
+
+
+        #Title Styles
+        title = Static(" ******** Disk Metrics ********")
+        title.styles.bold = True
+        title.styles.text_align = "center"
+        title.styles.background = "black"
+        title.styles.color = "white"
+
+        #Container Elements
+        used_disk_static = Static(f'Used Space: {disk_metrics["used"]} GB')
+        available_disk_static = Static(f'Available Space: N/A GB')  # Será atualizado dinamicamente        
+        trash_in_disk_static = Static(f"Trash: {disk_metrics["trash"]} GB")
+
+#####################
+        try:
+            # Extrair valores numéricos
+            used_val = float(disk_metrics["used"].split()[0])
+            available_val = float(disk_metrics["available"].split()[0])
+            trash_val = float(disk_metrics["trash"].split()[0])
+            
+            # ✅ CORREÇÃO: Escala baseada no total do disco (used + available)
+            total_disk = used_val + available_val
+            
+            # ✅ CORREÇÃO: Barras proporcionais ao total do disco
+            used_bars = "█" * max(1, int((used_val / total_disk) * 40))  # Mínimo 1 barra
+            available_bars = "░" * max(1, int(((available_val - used_val)/ total_disk) * 40))  # Mínimo 1 barra
+            trash_bars = "█" * max(1, int((trash_val / total_disk) * 40))  # Mínimo 1 barra
+            
+            # ✅ CORREÇÃO: Gráfico com barras sempre visíveis
+            chart_text = f"""
+╔══════════════════════════════════════════════════════════════════════════╗
+║                           DISK USAGE CHART                               ║
+╠══════════════════════════════════════════════════════════════════════════╣
+║  Used:      [{used_bars:<40}] {used_val:>8.3f} GB       ║
+║  Available: [{available_bars:<40}] {available_val-used_val:>8.3f} GB       ║
+║  Trash:     [{trash_bars:<40}] {trash_val:>8.2f} GB       ║
+╚══════════════════════════════════════════════════════════════════════════╝
+            """
+            
+            chart_widget = Static(chart_text)
+            chart_widget.styles.border = ("round", "blue")
+            chart_widget.styles.padding = (1, 2)
+            chart_widget.styles.text_align = "center"
+            
+            # Guardar referência para atualizar depois
+            self.chart_widget = chart_widget
+            
+        except Exception as e:
+            print(f"DEBUG: Error creating chart = {e}")
+            chart_widget = Static("Chart not available")
+            self.chart_widget = chart_widget
+
+
+
+
+
+
+###################
+        self.disk_used_static = used_disk_static
+        self.available_disk_static = available_disk_static
+        self.trash_in_disk_static = trash_in_disk_static
+
+        disk_metrics_container = Container(
+            used_disk_static,
+            available_disk_static,
+            trash_in_disk_static,
+            chart_widget,
+        )
+
+        disk_metrics_container.styles.margin = (1,2)
+        disk_metrics_container.styles.padding = (1,2)
+
+        self.body.mount(title)
+        self.body.mount(disk_metrics_container)
+
+
+#### POPUPS ####
     def popup_container(self):# Hidden Popup for initial config that shows up on startup
         
+        pop_title =  Static("NODE EXPORTER TUI CONFIGURATION")
+        pop_title.styles.padding = (1,2)
+
+
+        ip_input =  Input(placeholder="Enter Node Exporter Service IP: ", id='ip_input')
+        port_input = Input(placeholder="Enter Node Exporter Service Port: ", id='port_input')
+        sub_button = Button("Submit", id="submit_button")
+        sub_button.styles.margin = (2, 2)
+
 
         self.popup = Container(
             # Popup Elements
-            Static("NODE EXPORTER TUI CONFIGURATION"),
-            Input(placeholder="Enter Node Exporter Service IP: ", id='ip_input'),
-            Input(placeholder="Enter Node Exporter Service Port: ", id='port_input'),
-            Button("Submit", id="submit_button"),
+            pop_title,
+            ip_input,
+            port_input,
+            sub_button
         )
+        
 
         # Popup Styles
         self.popup.styles.background = "black"
@@ -159,7 +252,9 @@ class NodeExporter2Bash(App):
 
     async def on_mount(self):# Show popup on startup
         self.popup.visible = True # For initial config
+        self.background_task = asyncio.create_task(self.background_data_fetcher()) #Starts task after popup
 
+#### EVENT HANDLER ####
     async def on_button_pressed(self, event: Button.Pressed):# Event Handlers for button
 
         if event.button.id == "submit_button":
@@ -169,18 +264,110 @@ class NodeExporter2Bash(App):
             self.static_port = port
             self.log(f"Node Exporter IP: {self.static_ip}, Port: {self.static_port}") #LOGS
             self.popup.visible = False
+
     
         elif event.button.id == "nodexinfo":
             await self.node_exporter_info_tab()
 
         elif event.button.id == "nodeInfo":
             await self.node_info()
+        elif event.button.id == "diskmetrics":
+            await self.disk_metrics()
+
+#### MISC ####
             
+    async def background_data_fetcher(self):#Fetches Data in the background
+        while True:
+            try:
+                self.connection_status = await self.test_connection_to_storj_exporter()
+
+                if self.connection_status:
+                    loop = asyncio.get_running_loop()
+                    metrics = await loop.run_in_executor(
+                        None, get_storj_metrics, self.static_ip, self.static_port
+                    )
+                    if metrics:
+                        self.node_data, self.disk_metrics_data = parse_storj_metrics(metrics)
+
+                self._set_footer_status(self.connection_status)
+
+                try:
+                    if self.current_tab == "node_exporter_info" and hasattr(self, 'status_static'):
+                        if self.connection_status:
+                            self.status_static.update(f"ONLINE")
+                        else:
+                            self.status_static.update(f"OFFLINE")
+
+                    if self.current_tab == "disk_metrics" and hasattr(self, "disk_used_static"):
+                        self.disk_used_static.update(f"Used Space: {self.disk_metrics_data["used"]} GB")
+
+                    if self.current_tab == "disk_metrics" and hasattr(self, "available_disk_static"):
+                        # Usar dados reais do Node Exporter
+                        self.available_disk_static.update(f"Available Space: {self.disk_metrics_data["available"]} GB")
+                    
+                    if self.current_tab == "disk_metrics" and hasattr(self, "trash_in_disk_static"):
+                        self.trash_in_disk_static.update(f"Trash: {self.disk_metrics_data["trash"]} GB")
+                        ##########################
+                    if self.current_tab == "disk_metrics" and hasattr(self, "chart_widget"):
+                        try:
+                            # Extrair valores
+                            used_val = float(self.disk_metrics_data["used"].split()[0])
+                            available_val = float(self.disk_metrics_data["available"].split()[0])
+                            trash_val = float(self.disk_metrics_data["trash"].split()[0])
+                            
+                            # ✅ CORREÇÃO: Mesma escala baseada no total do disco
+                            total_disk = used_val + available_val
+                            
+                            # ✅ CORREÇÃO: Barras proporcionais ao total do disco
+                            used_bars = "█" * max(1, int((used_val / total_disk) * 40))  # Mínimo 1 barra
+                            available_bars = "░" * max(1, int(((available_val - used_val) / total_disk) * 40))  # Mínimo 1 barra
+                            trash_bars = "█" * max(1, int((trash_val / total_disk) * 40))  # Mínimo 1 barra
+                            
+                            # ✅ CORREÇÃO: Gráfico com barras sempre visíveis
+                            chart_text = f"""
+╔══════════════════════════════════════════════════════════════════════════╗
+║                           DISK USAGE CHART                               ║
+╠══════════════════════════════════════════════════════════════════════════╣
+║  Used:      [{used_bars:<40}] {used_val:>8.3f} GB       ║
+║  Available: [{available_bars:<40}] {available_val-used_val:>8.3f} GB       ║
+║  Trash:     [{trash_bars:<40}] {trash_val:>8.2f} GB       ║
+╚══════════════════════════════════════════════════════════════════════════╝
+                            """
+                            
+                            # Atualizar widget existente
+                            self.chart_widget.update(chart_text)
+                            
+                        except Exception as e:
+                            print(f"DEBUG: Erro ao atualizar gráfico = {e}")
 
 
 
 
+                        #####################
 
+                except:
+                    pass
+
+
+            except Exception as e:
+                self.connection_status = False
+                self._set_footer_status(False)
+            
+            await asyncio.sleep(1)
+
+    async def test_connection_to_storj_exporter(self):#Test connection to Node Exporter
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(
+            None, test_connection_to_storj_exporter, self.static_ip, self.static_port
+        )
+
+    def _set_footer_status(self, connected: bool): #Footer Connection State
+            if connected:
+                self.status.update("ONLINE")
+                self.status.styles.color = ("green")
+            else: 
+                self.status.update("OFFLINE")
+                self.status.styles.color = ("red")
 
 
 

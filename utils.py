@@ -37,7 +37,13 @@ def parse_storj_metrics(metrics):
     node_info = {
         "wallet": "N/A",
         "nodeID": "N/A",
-        "version": "N/A"
+        "version": "N/A",
+        "quic": "N/A"
+    }
+    disk_metrics = {
+        "used": "N/A",
+        "available": "N/A",
+        "trash": "N/A",
     }
 
     for line in metrics.splitlines():
@@ -48,15 +54,27 @@ def parse_storj_metrics(metrics):
                 node_info["version"] = line.split('version="')[1].split('"')[0]
             if 'nodeID="' in line:
                 node_info["nodeID"] = line.split('nodeID="')[1].split('"')[0]
-    
-    return node_info
+            if 'quicStatus=' in line:
+                node_info["quic"] = line.split('quicStatus="')[1].split('"')[0]
+        
+        if "storj_total_diskspace" in line:
+            if "used" in line:
+                disk_metrics["used"] = line.split('used"}')[1]
+                disk_metrics["used"] = f"{float(disk_metrics["used"]) / (1000**3):.5f}"
+            if "available" in line:
+                 disk_metrics["available"] = line.split('available"}')[1]
+                 disk_metrics["available"] = f"{float(disk_metrics["available"]) / (1000**3):.2f}"
+            if "trash" in line:
+                 disk_metrics["trash"] = line.split('trash"}')[1]
+                 disk_metrics["trash"] = f"{float(disk_metrics["trash"]) / (1000**3):.3f}"
+
+            print(disk_metrics["trash"])
+    return node_info, disk_metrics
 
 
-# Functions Of Curses TUI
 
 
 
-"""""
 def display_node_info(node_info):
 
     print("\nNode Information:")
@@ -66,24 +84,11 @@ def display_node_info(node_info):
 
 
 
-# TUI TERMINAL USER INTERFACE
-def main(stdscr):
-    curses.curs_set(0) # Hide cursor
-    stdscr.addstr(0, 2, "Storj Node Monitor", curses.A_BOLD)
-
-
-
-    stdscr.refresh()
-    stdscr.getch() #Wait for u input
-
-#MAIN
-
-
 if __name__ == "__main__":
 
     ################################################
     # Grab ip and port from user and test connection
-    curses.wrapper(main)
+
     ip = write_ip()
     port = write_port()
     test_connection_to_storj_exporter(ip, port)
@@ -97,4 +102,3 @@ if __name__ == "__main__":
     display_node_info(parsed_metrics_node_dict)
     ################################################
 
-"""
