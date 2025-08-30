@@ -8,20 +8,32 @@ from utils import *
 import asyncio
 
 class NodeExporter2Bash(App):
-    #TUI FOR NODE EXPORTER
+    # Textual TUI application for browsing Storj Node Exporter data.
+    # This app provides multiple tabs to visualize exporter connectivity,
+    # node information, disk metrics, and satellite details. Background
+    # tasks periodically fetch and refresh metrics without blocking the UI.
+    # TUI FOR NODE EXPORTER
 
-    def __init__(self):# Initialize static variables
+    def __init__(self):  # Initialize static variables (UI state only)
         super().__init__()
         self.static_ip = ""
         self.static_port = ""
         self.node_data = {"wallet": "N/A", "nodeID": "N/A", "version": "N/A", "quic": "N/A",}
         self.disk_metrics_data = {"used": "N/A", "available": "N/A", "trash": "N/A",}
         self.satellite_saltlake = {"satellitename": "N/A", "storageSummary": "N/A", "bandwidthSummary": "N/A", "egressSummary": "N/A", "ingressSummary": "N/A", "disqualified": "N/A", "suspended": "N/A",}
+        self.sat_info_saltlake = {"satellitename": "N/A", "storageSummary": "N/A", "bandwidthSummary": "N/A", "egressSummary": "N/A", "ingressSummary": "N/A", "disqualified": "N/A", "suspended": "N/A",}
+        self.sat_info_eu1 = {"satellitename": "N/A", "storageSummary": "N/A", "bandwidthSummary": "N/A", "egressSummary": "N/A", "ingressSummary": "N/A", "disqualified": "N/A", "suspended": "N/A", "monthly_egress_repair": "N/A", "monthly_egress_audit": "N/A", "monthly_egress_usage": "N/A",}
+        self.sat_info_ap1 = {"satellitename": "N/A", "storageSummary": "N/A", "bandwidthSummary": "N/A", "egressSummary": "N/A", "ingressSummary": "N/A", "disqualified": "N/A", "suspended": "N/A", "monthly_egress_repair": "N/A", "monthly_egress_audit": "N/A", "monthly_egress_usage": "N/A",}
+        self.sat_info_us1 = {"satellitename": "N/A", "storageSummary": "N/A", "bandwidthSummary": "N/A", "egressSummary": "N/A", "ingressSummary": "N/A", "disqualified": "N/A", "suspended": "N/A", "monthly_egress_repair": "N/A", "monthly_egress_audit": "N/A", "monthly_egress_usage": "N/A",}
         self.connection_status = False
         self.background_task = None
         self.current_tab = None
-
-    def compose(self) -> ComposeResult: # Compose the app
+##########################################
+    def compose(self) -> ComposeResult:  # Compose the app layout
+        # Builds the initial application layout and static widgets.
+        # Returns the header/title, tab buttons, a placeholder body container
+        # (that will host tab content), and a footer with connection status
+        # and author credit.
         ##### App title and header #####
         apptitle = Static("Node Exporter TUI")
         apptitle.styles.text_align = "center"
@@ -57,7 +69,10 @@ class NodeExporter2Bash(App):
         
 
 #### TABS ####
-    async def node_exporter_info_tab(self):# Container for Node Exporter Info TAB
+    async def node_exporter_info_tab(self):  # Container for Node Exporter Info TAB
+        # Render the Node Exporter connectivity tab.
+        # Shows current ONLINE/OFFLINE state, configured IP/Port and a
+        # framed info box. The content is updated by the background refresher.
         self.current_tab = "node_exporter_info"
         self.body.remove_children()
         self.body.styles.height = "70%"
@@ -101,7 +116,10 @@ class NodeExporter2Bash(App):
 
         self.body.mount(centered_infobox)
 
-    async def node_info(self): # Container for Node Info TAB
+##########################################
+
+    async def node_info(self):  # Container for Node Info TAB
+        # Render the Node Info tab with wallet, nodeID, version and QUIC.
         self.current_tab = "node_info"
         self.body.remove_children()
         self.body.styles.height = "85%"
@@ -137,9 +155,14 @@ class NodeExporter2Bash(App):
 
         self.body.mount(title)
         self.body.mount(info_container)
+##########################################
 
     async def disk_metrics(self):
-        #Misc
+        # Render the Disk Metrics tab with textual chart and values.
+        # The ASCII chart is computed from the current `disk_metrics_data` and
+        # is refreshed periodically by the background task while this tab is
+        # active.
+        # Misc
         self.current_tab = "disk_metrics"
         self.body.remove_children()
         self.body.styles.height = "85%"
@@ -160,9 +183,9 @@ class NodeExporter2Bash(App):
         available_disk_static = Static(f'Available Space: N/A GB')    
         trash_in_disk_static = Static(f"Trash: {disk_metrics["trash"]} GB")
 
-        # A.I Coded this entirely had to adjust some value and create 1 small detail ai wasnt being able to do
+        # Chart generation (ASCII bars). Values are parsed defensively.
         try:
-            # Extact values
+            # Extract values
             used_val = float(disk_metrics["used"].split()[0])
             available_val = float(disk_metrics["available"].split()[0])
             trash_val = float(disk_metrics["trash"].split()[0])
@@ -216,11 +239,255 @@ class NodeExporter2Bash(App):
         self.body.mount(disk_metrics_container)
 
 ##########################################
+    async def sat_eu1(self):
+        # Render the EU1 satellite detail view with metrics and status.
+        # Misc
+        self.current_tab = "sat_eu1"
+        self.body.remove_children()
+        self.body.styles.height = "85%"
+        self.body.styles.width = "100%"
 
+        #Title Styles
+        title = Static(" ******** EU1 Info ********")
+        title.styles.bold = True
+        title.styles.text_align = "center"
+        title.styles.background = "black"
+        title.styles.color = "white"
+
+        button_return = Button("RETURN", id="but_sat_return", variant="primary")
+
+        stripe = Static("")
+        stripe.styles.background = "black"
+        stripe.styles.width = 2
+        stripe.styles.height = "100%"
+
+        # Grab current satellite info snapshot
+        eu1 = self.sat_info_eu1
+
+        self.eu1_sat_name_static = Static(f"Satellite: {eu1["satellitename"]}")
+        self.eu1_sat_storagesum_static = Static(f"Storage Summary: {eu1["storageSummary"]} GB")
+        self.eu1_sat_bandwithsum_static =  Static(f"Bandwith Summary: {eu1["bandwidthSummary"]} GB")
+        self.eu1_sat_egresssum_static = Static(f"Egress Summary: {eu1["egressSummary"]} GB")
+        self.eu1_sat_ingresssum_static = Static(f"Ingress Summary: {eu1["ingressSummary"]} GB")
+        self.eu1_sat_disqualified_static = Static(f"Disqualified Status: {eu1["disqualified"]}")
+        self.eu1_sat_suspended_static = Static(f"Suspended Status: {eu1["suspended"]}")
+        self.eu1_sat_month_egress_repair_static = Static(f"Monthly Egress Repair: {eu1["monthly_egress_repair"]}")
+        self.eu1_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {eu1["monthly_egress_audit"]}")
+        self.eu1_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {eu1["monthly_egress_usage"]}")
+
+
+        # Satellite info container (labels on the right panel)
+        container = Container(
+            self.eu1_sat_name_static,
+            self.eu1_sat_storagesum_static,
+            self.eu1_sat_bandwithsum_static,
+            self.eu1_sat_egresssum_static,
+            self.eu1_sat_ingresssum_static,
+            self.eu1_sat_disqualified_static,
+            self.eu1_sat_suspended_static,
+            self.eu1_sat_month_egress_repair_static,
+            self.eu1_sat_month_egress_audit_static,
+            self.eu1_sat_month_egress_usage_static
+            
+        )
+
+        row = Horizontal(
+            button_return,
+            stripe,
+            container,
+        )
+
+        self.body.mount(title, row)
+
+######################        
+    async def sat_saltlake(self):
+        # Render the Saltlake satellite detail view with metrics and status.
+        # Misc
+        self.current_tab = "sat_saltlake"
+        self.body.remove_children()
+        self.body.styles.height = "85%"
+        self.body.styles.width = "100%"
+
+        #Title Styles
+        title = Static(" ******** Saltlake Info ********")
+        title.styles.bold = True
+        title.styles.text_align = "center"
+        title.styles.background = "black"
+        title.styles.color = "white"
+
+        button_return = Button("RETURN", id="but_sat_return", variant="primary")
+
+        stripe = Static("")
+        stripe.styles.background = "black"
+        stripe.styles.width = 2
+        stripe.styles.height = "100%"
+
+        # Grab current satellite info snapshot
+        saltlake = self.sat_info_saltlake
+
+        self.saltlake_sat_name_static = Static(f"Satellite: {saltlake["satellitename"]}")
+        self.saltlake_sat_storagesum_static = Static(f"Storage Summary: {saltlake["storageSummary"]} GB")
+        self.saltlake_sat_bandwithsum_static =  Static(f"Bandwith Summary: {saltlake["bandwidthSummary"]} GB")
+        self.saltlake_sat_egresssum_static = Static(f"Egress Summary: {saltlake["egressSummary"]} GB")
+        self.saltlake_sat_ingresssum_static = Static(f"Ingress Summary: {saltlake["ingressSummary"]} GB")
+        self.saltlake_sat_disqualified_static = Static(f"Disqualified Status: {saltlake["disqualified"]}")
+        self.saltlake_sat_suspended_static = Static(f"Suspended Status: {saltlake["suspended"]}")
+        self.saltlake_sat_month_egress_repair_static = Static(f"Monthly Egress Repair: {saltlake["monthly_egress_repair"]}")
+        self.saltlake_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {saltlake["monthly_egress_audit"]}")
+        self.saltlake_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {saltlake["monthly_egress_usage"]}")
+
+
+        # Satellite info container (labels on the right panel)
+        container = Container(
+            self.saltlake_sat_name_static,
+            self.saltlake_sat_storagesum_static,
+            self.saltlake_sat_bandwithsum_static,
+            self.saltlake_sat_egresssum_static,
+            self.saltlake_sat_ingresssum_static,
+            self.saltlake_sat_disqualified_static,
+            self.saltlake_sat_suspended_static,
+            self.saltlake_sat_month_egress_repair_static,
+            self.saltlake_sat_month_egress_audit_static,
+            self.saltlake_sat_month_egress_usage_static
+            
+        )
+
+        row = Horizontal(
+            button_return,
+            stripe,
+            container,
+        )
+
+        self.body.mount(title, row)
+
+############
+    async def sat_us1(self):
+        #
+        # Misc
+        self.current_tab = "sat_us1"
+        self.body.remove_children()
+        self.body.styles.height = "85%"
+        self.body.styles.width = "100%"
+
+        # Style
+        title = Static(" ******** US1 Info ********")
+        title.styles.bold = True
+        title.styles.text_align = "center"
+        title.styles.background = "black"
+        title.styles.color = "white"
+
+        #Buttons and Misc
+        button_return = Button("RETURN", id="but_sat_return", variant="primary")
+
+        stripe = Static("")
+        stripe.styles.background = "black"
+        stripe.styles.width = 2
+        stripe.styles.height = "100%"
+
+        # Grabs info from exporter
+        us1 = self.sat_info_us1
+
+        self.us1_sat_name_static = Static(f"Satellite: {us1['satellitename']}")
+        self.us1_sat_storagesum_static = Static(f"Storage Summary: {us1['storageSummary']} GB")
+        self.us1_sat_bandwithsum_static = Static(f"Bandwith Summary: {us1['bandwidthSummary']} GB")
+        self.us1_sat_egresssum_static = Static(f"Egress Summary: {us1['egressSummary']} GB")
+        self.us1_sat_ingresssum_static = Static(f"Ingress Summary: {us1['ingressSummary']} GB")
+        self.us1_sat_disqualified_static = Static(f"Disqualified Status: {us1['disqualified']}")
+        self.us1_sat_suspended_static = Static(f"Suspended Status: {us1['suspended']}")
+        self.us1_sat_month_egress_repair_static = Static(f"Monthly Egress Repair: {us1['monthly_egress_repair']}")
+        self.us1_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {us1['monthly_egress_audit']}")
+        self.us1_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {us1['monthly_egress_usage']}")
+
+        # container for labels
+        container = Container(
+            self.us1_sat_name_static,
+            self.us1_sat_storagesum_static,
+            self.us1_sat_bandwithsum_static,
+            self.us1_sat_egresssum_static,
+            self.us1_sat_ingresssum_static,
+            self.us1_sat_disqualified_static,
+            self.us1_sat_suspended_static,
+
+            self.us1_sat_month_egress_repair_static,
+            self.us1_sat_month_egress_audit_static,
+            self.us1_sat_month_egress_usage_static
+        )
+
+        row = Horizontal(
+            button_return,
+            stripe,
+            container,
+        )
+
+        self.body.mount(title, row)
+
+
+
+#############
+    async def sat_ap1(self):
+        # Render the AP1 satellite detail view with metrics and status.
+        # Misc
+        self.current_tab = "sat_ap1"
+        self.body.remove_children()
+        self.body.styles.height = "85%"
+        self.body.styles.width = "100%"
+
+        #Title Styles
+        title = Static(" ******** AP1 Info ********")
+        title.styles.bold = True
+        title.styles.text_align = "center"
+        title.styles.background = "black"
+        title.styles.color = "white"
+
+        button_return = Button("RETURN", id="but_sat_return", variant="primary")
+
+        stripe = Static("")
+        stripe.styles.background = "black"
+        stripe.styles.width = 2
+        stripe.styles.height = "100%"
+
+        # Grab current satellite info snapshot
+        ap1 = self.sat_info_ap1
+
+        self.ap1_sat_name_static = Static(f"Satellite: {ap1["satellitename"]}")
+        self.ap1_sat_storagesum_static = Static(f"Storage Summary: {ap1["storageSummary"]} GB")
+        self.ap1_sat_bandwithsum_static =  Static(f"Bandwith Summary: {ap1["bandwidthSummary"]} GB")
+        self.ap1_sat_egresssum_static = Static(f"Egress Summary: {ap1["egressSummary"]} GB")
+        self.ap1_sat_ingresssum_static = Static(f"Ingress Summary: {ap1["ingressSummary"]} GB")
+        self.ap1_sat_disqualified_static = Static(f"Disqualified Status: {ap1["disqualified"]}")
+        self.ap1_sat_suspended_static = Static(f"Suspended Status: {ap1["suspended"]}")
+        self.ap1_sat_month_egress_repair_static = Static(f"Monthly Egress Repair: {ap1["monthly_egress_repair"]}")
+        self.ap1_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {ap1["monthly_egress_audit"]}")
+        self.ap1_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {ap1["monthly_egress_usage"]}")
+
+
+        # Satellite info container (labels on the right panel)
+        container = Container(
+            self.ap1_sat_name_static,
+            self.ap1_sat_storagesum_static,
+            self.ap1_sat_bandwithsum_static,
+            self.ap1_sat_egresssum_static,
+            self.ap1_sat_ingresssum_static,
+            self.ap1_sat_disqualified_static,
+            self.ap1_sat_suspended_static,
+            self.ap1_sat_month_egress_repair_static,
+            self.ap1_sat_month_egress_audit_static,
+            self.ap1_sat_month_egress_usage_static
+            
+        )
+
+        row = Horizontal(
+            button_return,
+            stripe,
+            container,
+        )
+
+        self.body.mount(title, row)
 
 ##########################################
     def sattelites_tab(self):
-        #Misc
+        # Render the Satellites hub tab with navigation buttons.
+        # Misc
         self.current_tab = "satellites"
         self.body.remove_children()
         self.body.styles.height = "85%"
@@ -234,16 +501,40 @@ class NodeExporter2Bash(App):
         title.styles.color = "white"
         
         button_saltlake = Button("SALTLAKE", id="sat_saltlake", variant="primary")
+        button_AP1 = Button("AP1", id="sat_ap1", variant="primary")
+        button_EU1 = Button("EU1", id="sat_eu1", variant="primary")
+        button_US1 = Button("US1", id="sat_us1", variant="primary")
 
-        vertical_container = Vertical(
-            button_saltlake
+        stripe = Static("")
+        stripe.styles.background = "black"
+        stripe.styles.width = 2
+        stripe.styles.height = "100%"
+
+
+        buttons = Vertical(
+            button_saltlake,
+            button_AP1,            
+            button_EU1,
+            button_US1,            
         )
 
-        self.body.mount(title, vertical_container)
+        # Container with buttons and separator line
+        left_panel = Horizontal(
+            buttons,
+            stripe,
+        )
+        left_panel.styles.width = 17  # Fixed width to hold buttons + separator
 
+        row = Horizontal(
+            left_panel,
+        )
+
+        self.body.mount(title, row)
+##########################################
 
     #### POPUPS ####
-    def popup_container(self):# Hidden Popup for initial config that shows up on startup
+    def popup_container(self):  # Hidden Popup for initial config that shows up on startup
+        # Create the initial configuration popup for IP and Port input.
         
         pop_title =  Static("NODE EXPORTER TUI CONFIGURATION")
         pop_title.styles.padding = (1,2)
@@ -271,24 +562,27 @@ class NodeExporter2Bash(App):
         self.popup.visible = False
 
         return self.popup
+##########################################
 
+    async def on_mount(self):  # Show popup on startup
+        # Display configuration popup and start the background fetcher.
+        self.popup.visible = True  # For initial config
+        self.background_task = asyncio.create_task(self.background_data_fetcher())  # Starts task after popup
 
-    async def on_mount(self):# Show popup on startup
-        self.popup.visible = True # For initial config
-        self.background_task = asyncio.create_task(self.background_data_fetcher()) #Starts task after popup
-
+##########################################
     #### EVENT HANDLER ####
-    async def on_button_pressed(self, event: Button.Pressed):# Event Handlers for button
+    async def on_button_pressed(self, event: Button.Pressed):  # Event Handlers for buttons
+        # Handle all button clicks from the header and tab content.
 
         if event.button.id == "submit_button":
             ip = self.query_one("#ip_input").value
             port = self.query_one("#port_input").value
             self.static_ip = ip
             self.static_port = port
-            self.log(f"Node Exporter IP: {self.static_ip}, Port: {self.static_port}") #LOGS
+            self.log(f"Node Exporter IP: {self.static_ip}, Port: {self.static_port}")  # Logs
             self.popup.visible = False
 
-    
+        #Whenver a button is pressed:
         elif event.button.id == "nodexinfo":
             await self.node_exporter_info_tab()
         elif event.button.id == "nodeInfo":
@@ -297,11 +591,22 @@ class NodeExporter2Bash(App):
             await self.disk_metrics()
         elif event.button.id == "satellites":
             self.sattelites_tab()
+        elif event.button.id == "sat_saltlake":
+            await self.sat_saltlake()
+        elif event.button.id == "but_sat_return":
+              self.sattelites_tab()
+        elif event.button.id == "sat_ap1":
+            await self.sat_ap1()
+        elif event.button.id == "sat_eu1":
+            await self.sat_eu1()
+        elif event.button.id == "sat_us1":
+            await self.sat_us1()
 
-
-    #### MISC ####
-            
-    async def background_data_fetcher(self):#Fetches Data in the background
+##########################################        
+    async def background_data_fetcher(self):  # Fetches Data in the background
+        # Background loop to test connectivity and refresh metrics.
+        # Runs every second, updating in-memory state and refreshing UI widgets
+        # on the active tab if they are mounted.
         while True:
             try:
                 self.connection_status = await self.test_connection_to_storj_exporter()
@@ -317,23 +622,150 @@ class NodeExporter2Bash(App):
                 self._set_footer_status(self.connection_status)
 
                 try:
-                    #Node Info
+                    # Node Exporter Info tab: update ONLINE/OFFLINE label
                     if self.current_tab == "node_exporter_info" and hasattr(self, 'status_static'):
                         if self.connection_status:
                             self.status_static.update(f"ONLINE")
                         else:
                             self.status_static.update(f"OFFLINE")
+                    ########
+                    # Satellites (Saltlake) labels
+                    if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_name_static"):
+                        self.saltlake_sat_name_static.update(f"Satellite: {self.sat_info_saltlake['satellitename']}")
 
-                    #Satellites
+                    if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_storagesum_static"):
+                        self.saltlake_sat_storagesum_static.update(f"Storage Summary: {self.sat_info_saltlake['storageSummary']} GB")
+                    
+                    if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_bandwithsum_static"):
+                        self.saltlake_sat_bandwithsum_static.update(f"Bandwith Summary: {self.sat_info_saltlake['bandwidthSummary']} GB")
+                    
+                    if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_egresssum_static"):
+                        self.saltlake_sat_egresssum_static.update(f"Egress Summary: {self.sat_info_saltlake['egressSummary']} GB")
+                    
+                    if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_ingresssum_static"):
+                        self.saltlake_sat_ingresssum_static.update(f"Ingress Summary: {self.sat_info_saltlake['ingressSummary']} GB")
+                    
+                    if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_disqualified_static"):
+                        self.saltlake_sat_disqualified_static.update(f"Disqualified Status: {self.sat_info_saltlake['disqualified']}")
+                    
+                    if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_suspended_static"):
+                        self.saltlake_sat_suspended_static.update(f"Suspended Status: {self.sat_info_saltlake['suspended']}")
 
+                    if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_month_egress_repair_static"):
+                        self.saltlake_sat_month_egress_repair_static.update(f"Monthly Egress Repair: {self.sat_info_saltlake['monthly_egress_repair']}")
+
+                    if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_month_egress_audit_static"):
+                        self.saltlake_sat_month_egress_audit_static.update(f"Monthly Egress Audit: {self.sat_info_saltlake['monthly_egress_audit']}")
+
+                    if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_month_egress_usage_static"):
+                        self.saltlake_sat_month_egress_usage_static.update(f"Monthly Egress Usage: {self.sat_info_saltlake['monthly_egress_usage']}")
+
+
+                    ############
+
+
+                    #EU1 labels
+
+                    if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_name_static"):
+                        self.eu1_sat_name_static.update(f"Satellite: {self.sat_info_eu1['satellitename']}")
+                    if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_storagesum_static"):
+                        self.eu1_sat_storagesum_static.update(f"Storage Summary: {self.sat_info_eu1['storageSummary']} GB")
+                    if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_bandwithsum_static"):
+                        self.eu1_sat_bandwithsum_static.update(f"Bandwith Summary: {self.sat_info_eu1['bandwidthSummary']} GB")
+                    if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_egresssum_static"):
+                        self.eu1_sat_egresssum_static.update(f"Egress Summary: {self.sat_info_eu1['egressSummary']} GB")
+                    if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_ingresssum_static"):
+                        self.eu1_sat_ingresssum_static.update(f"Ingress Summary: {self.sat_info_eu1['ingressSummary']} GB")
+                    if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_disqualified_static"):
+                        self.eu1_sat_disqualified_static.update(f"Disqualified Status: {self.sat_info_eu1['disqualified']}")
+                    if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_suspended_static"):
+                        self.eu1_sat_suspended_static.update(f"Suspended Status: {self.sat_info_eu1['suspended']}")
+
+
+                    if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_month_egress_repair_static"):
+                        self.eu1_sat_month_egress_repair_static.update(f"Monthly Egress Repair: {self.sat_info_eu1['monthly_egress_repair']}")
+                    if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_month_egress_audit_static"):
+                        self.eu1_sat_month_egress_audit_static.update(f"Monthly Egress Audit: {self.sat_info_eu1['monthly_egress_audit']}")
+                    if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_month_egress_usage_static"):
+                        self.eu1_sat_month_egress_usage_static.update(f"Monthly Egress Usage: {self.sat_info_eu1['monthly_egress_usage']}")
                 
-  
-                    #Disk Metrics###
+                    ###########
+
+                    # US1 labels
+
+                    if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_name_static"):
+                        self.us1_sat_name_static.update(f"Satellite: {self.sat_info_us1['satellitename']}")
+                    if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_storagesum_static"):
+                        self.us1_sat_storagesum_static.update(f"Storage Summary: {self.sat_info_us1['storageSummary']} GB")
+                    if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_bandwithsum_static"):
+                        self.us1_sat_bandwithsum_static.update(f"Bandwith Summary: {self.sat_info_us1['bandwidthSummary']} GB")
+                    if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_egresssum_static"):
+                        self.us1_sat_egresssum_static.update(f"Egress Summary: {self.sat_info_us1['egressSummary']} GB")
+                    if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_ingresssum_static"):
+                        self.us1_sat_ingresssum_static.update(f"Ingress Summary: {self.sat_info_us1['ingressSummary']} GB")
+                    if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_disqualified_static"):
+                        self.us1_sat_disqualified_static.update(f"Disqualified Status: {self.sat_info_us1['disqualified']}")
+                    if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_suspended_static"):
+                        self.us1_sat_suspended_static.update(f"Suspended Status: {self.sat_info_us1['suspended']}")
+
+                    if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_month_egress_repair_static"):
+                        self.us1_sat_month_egress_repair_static.update(f"Monthly Egress Repair: {self.sat_info_us1['monthly_egress_repair']}")
+
+                    if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_month_egress_audit_static"):
+                        self.us1_sat_month_egress_audit_static.update(f"Monthly Egress Audit: {self.sat_info_us1['monthly_egress_audit']}")
+
+                    if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_month_egress_usage_static"):
+                        self.us1_sat_month_egress_usage_static.update(f"Monthly Egress Usage: {self.sat_info_us1['monthly_egress_usage']}")
+
+
+
+                    ####
+
+                    # (AP1) labels
+
+                    if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_name_static"):
+                        self.ap1_sat_name_static.update(f"Satellite: {self.sat_info_ap1["satellitename"]}")
+
+                    if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_storagesum_static"):
+                        self.ap1_sat_storagesum_static.update(f"Storage Summary: {self.sat_info_ap1["storageSummary"]} GB")
+                        
+                    if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_bandwithsum_static"):
+                        self.ap1_sat_bandwithsum_static.update(f"Bandwith Summary: {self.sat_info_ap1["bandwidthSummary"]} GB")
+                    
+                    if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_bandwithsum_static"):
+                            self.ap1_sat_bandwithsum_static.update(f"Bandwith Summary: {self.sat_info_ap1["bandwidthSummary"]} GB")
+
+                    if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_egresssum_static"):
+                            self.ap1_sat_egresssum_static.update(f"Egress Summary: {self.sat_info_ap1["egressSummary"]} GB")
+                    
+                    if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_ingresssum_static" ):
+                            self.ap1_sat_ingresssum_static.update(f"Ingress Summary: {self.sat_info_ap1["ingressSummary"]} GB")
+                        
+                    if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_disqualified_static"):    
+                            self.ap1_sat_disqualified_static.update(f"Disqualified Status: {self.sat_info_ap1["disqualified"]}")
+                        
+                    if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_suspended_static" ):
+                        self.ap1_sat_suspended_static.update(f"Suspended Status: {self.sat_info_ap1["suspended"]}")
+                    
+                    if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_month_egress_repair_static"):
+                        self.ap1_sat_month_egress_repair_static.update(f"Monthly Egress Repair: {self.sat_info_ap1["monthly_egress_repair"]}")
+
+                    if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_month_egress_audit_static"):
+                        self.ap1_sat_month_egress_audit_static.update(f"Monthly Egress Audit: {self.sat_info_ap1["monthly_egress_audit"]}")
+
+                    if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_month_egress_usage_static"):
+                        self.ap1_sat_month_egress_usage_static.update(f"Monthly Egress Usage: {self.sat_info_ap1["monthly_egress_usage"]}")
+
+                        
+                    
+                    ######################
+
+                    # Disk Metrics
                     if self.current_tab == "disk_metrics" and hasattr(self, "disk_used_static"):
                         self.disk_used_static.update(f"Used Space: {self.disk_metrics_data["used"]} GB")
 
                     if self.current_tab == "disk_metrics" and hasattr(self, "available_disk_static"):
-                        # Usar dados reais do Node Exporter
+                        # Use real data from Node Exporter
                         self.available_disk_static.update(f"Available Space: {self.disk_metrics_data["available"]} GB")
                     
                     if self.current_tab == "disk_metrics" and hasattr(self, "trash_in_disk_static"):
@@ -342,7 +774,7 @@ class NodeExporter2Bash(App):
 
                     if self.current_tab == "disk_metrics" and hasattr(self, "chart_widget"):
                         try:
-                            # A.I Coded this entirely had to adjust some value and create 1 small detail ai wasnt being able to do
+                            # Recompute chart bars on live updates
                             
                             used_val = float(self.disk_metrics_data["used"].split()[0])
                             available_val = float(self.disk_metrics_data["available"].split()[0])
@@ -367,7 +799,7 @@ class NodeExporter2Bash(App):
 ╚══════════════════════════════════════════════════════════════════════════╝
                             """
                             
-                            # Updates the existing widget
+                            # Update the existing widget
                             self.chart_widget.update(chart_text)
                             
                         except Exception as e:
@@ -382,21 +814,25 @@ class NodeExporter2Bash(App):
                 self._set_footer_status(False)
             
             await asyncio.sleep(1)
+##########################################
 
-    async def test_connection_to_storj_exporter(self):#Test connection to Node Exporter
+    async def test_connection_to_storj_exporter(self):  # Test connection to Node Exporter
+        # Check exporter reachability using current IP/Port in a thread pool.
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(
             None, test_connection_to_storj_exporter, self.static_ip, self.static_port
         )
+##########################################
 
-    def _set_footer_status(self, connected: bool): #Footer Connection State
+    def _set_footer_status(self, connected: bool):  # Footer Connection State
+            # Update footer label and color according to connectivity.
             if connected:
                 self.status.update("ONLINE")
                 self.status.styles.color = ("green")
             else: 
                 self.status.update("OFFLINE")
                 self.status.styles.color = ("red")
-
+##########################################
 
 
 if __name__ == "__main__":

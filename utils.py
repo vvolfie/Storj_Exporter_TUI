@@ -54,6 +54,10 @@ def parse_storj_metrics(metrics):
         "ingressSummary": "N/A",
         "disqualified": "N/A",
         "suspended": "N/A",
+        "monthly_egress_repair": "N/A",
+        "monthly_egress_audit": "N/A",
+        "monthly_egress_usage": "N/A",
+
     }
 
     satellite_info_ap1 = {
@@ -64,6 +68,9 @@ def parse_storj_metrics(metrics):
         "ingressSummary": "N/A",
         "disqualified": "N/A",
         "suspended": "N/A",
+        "monthly_egress_repair": "N/A",
+        "monthly_egress_audit": "N/A",
+        "monthly_egress_usage": "N/A",
     }
 
     satellite_info_us1 = {
@@ -74,6 +81,9 @@ def parse_storj_metrics(metrics):
         "ingressSummary": "N/A",
         "disqualified": "N/A",
         "suspended": "N/A",
+        "monthly_egress_repair": "N/A",
+        "monthly_egress_audit": "N/A",
+        "monthly_egress_usage": "N/A",
     }
     satellite_info_eu1 = {
         "satellitename": "N/A",
@@ -83,6 +93,9 @@ def parse_storj_metrics(metrics):
         "ingressSummary": "N/A",
         "disqualified": "N/A",
         "suspended": "N/A",
+        "monthly_egress_repair": "N/A",
+        "monthly_egress_audit": "N/A",
+        "monthly_egress_usage": "N/A",
     }
 
     for line in metrics.splitlines():
@@ -98,8 +111,7 @@ def parse_storj_metrics(metrics):
             if 'quicStatus=' in line:
                 node_info["quic"] = line.split('quicStatus="')[1].split('"')[0]
 
-        # Disk Metrics
-        
+        # Disk Metrics       
         if "storj_total_diskspace" in line:
             if "used" in line:
                 disk_metrics["used"] = line.split('used"}')[1]
@@ -113,8 +125,7 @@ def parse_storj_metrics(metrics):
 
 
         #Satellites INFO
-
-        #saltlake
+        #saltlake.tardigrade.io:7777
         if "storj_sat_summary" in line:
             if "1wFTAgs9DP5RSnCqKV1eLf6N9wtk4EAtmN5DpSxcs8EjT69tGE" in line:
                     satellite_info_saltlake["satellitename"] = line.split('url="')[1].split('"')[0]
@@ -143,7 +154,7 @@ def parse_storj_metrics(metrics):
                 else:
                     satellite_info_saltlake["suspended"] = "True"
 
-        #ap1satellite_info_ap1
+        #ap1.storj.io:7777
         if "storj_sat_summary" in line:
             if "121RTSDpyNZVcEU84Ticf2L1ntiuUimbWgfATz21tuvgk3vzoA6" in line:
                     satellite_info_ap1["satellitename"] = line.split('url="')[1].split('"')[0]
@@ -230,23 +241,87 @@ def parse_storj_metrics(metrics):
                 else:
                     satellite_info_eu1["suspended"] = "True"            
 
+        #Monthly Egress Stats
+        if "storj_sat_month_egress" in line:
+            #Repair
+            if 'type="repair"' in line:
+                if "saltlake" in line:
+                    satellite_info_saltlake["monthly_egress_repair"] = line.split()[-1]
+                elif "ap1" in line:
+                    satellite_info_ap1["monthly_egress_repair"] = line.split()[-1]
+                elif "us1" in line:
+                    satellite_info_us1["monthly_egress_repair"] = line.split()[-1]
+                elif "eu1" in line:
+                    satellite_info_eu1["monthly_egress_repair"] = line.split()[-1]
+            
+            #Audit
+            if 'type="audit"' in line:
+                if "saltlake" in line:
+                    satellite_info_saltlake["monthly_egress_audit"] = line.split()[-1]
+                elif "ap1" in line:
+                    satellite_info_ap1["monthly_egress_audit"] = line.split()[-1]
+                elif "us1" in line:
+                    satellite_info_us1["monthly_egress_audit"] = line.split()[-1]
+                elif "eu1" in line:
+                    satellite_info_eu1["monthly_egress_audit"] = line.split()[-1]
 
+            #Usage
+            if 'type="usage"' in line:
+                if "saltlake" in line:
+                    satellite_info_saltlake["monthly_egress_usage"] = line.split()[-1]
+                elif "ap1" in line:
+                    satellite_info_ap1["monthly_egress_usage"] = line.split()[-1]
+                elif "us1" in line:
+                    satellite_info_us1["monthly_egress_usage"] = line.split()[-1]
+                elif "eu1" in line:
+                    satellite_info_eu1["monthly_egress_usage"] = line.split()[-1]
 
+        #Monthly Ingress
+        if "storj_sat_month_ingress" in line:
+            #Repair
+            if 'type="repair"' in line:
+                if "saltlake" in line:
+                    satellite_info_saltlake["monthly_ingress_repair"] = line.split()[-1]
+                elif "ap1" in line:
+                    satellite_info_ap1["monthly_ingress_repair"] = line.split()[-1]
+                elif "us1" in line:
+                    satellite_info_us1["monthly_ingress_repair"] = line.split()[-1]
+                elif "eu1" in line:
+                    satellite_info_eu1["monthly_ingress_repair"] = line.split()[-1]
+            
+            #Audit
+            if 'type="audit"' in line:
+                if "saltlake" in line:
+                    satellite_info_saltlake["monthly_ingress_audit"] = line.split()[-1]
+                elif "ap1" in line:
+                    satellite_info_ap1["monthly_ingress_audit"] = line.split()[-1]
+                elif "us1" in line:
+                    satellite_info_us1["monthly_ingress_audit"] = line.split()[-1]
+                elif "eu1" in line:
+                    satellite_info_eu1["monthly_ingress_audit"] = line.split()[-1]
+
+            #Usage
+            if 'type="usage"' in line:
+                if "saltlake" in line:
+                    satellite_info_saltlake["monthly_ingress_usage"] = line.split()[-1]
+                elif "ap1" in line:
+                    satellite_info_ap1["monthly_ingress_usage"] = line.split()[-1]
+                elif "us1" in line:
+                    satellite_info_us1["monthly_ingress_usage"] = line.split()[-1]
+                elif "eu1" in line:
+                    satellite_info_eu1["monthly_ingress_usage"] = line.split()[-1]
+
+                    
     return satellite_info_eu1, disk_metrics, node_info, satellite_info_ap1, satellite_info_saltlake, satellite_info_us1
+   # satellite_info_saltlake
     # return node_info, disk_metrics satellite_info_saltlake
 
 
 
 
 
-def display_node_info(satellite_info_eu1):
-    print(satellite_info_eu1["satellitename"])
-    print(satellite_info_eu1["storageSummary"])
-    print(satellite_info_eu1["bandwidthSummary"])
-    print(satellite_info_eu1["egressSummary"])
-    print(satellite_info_eu1["ingressSummary"])
-    print(satellite_info_eu1["disqualified"])
-    print(satellite_info_eu1["suspended"])
+def display_node_info(satellite_info_saltlake):
+    print(satellite_info_saltlake["monthly_egress_repair"])
 
     
 
