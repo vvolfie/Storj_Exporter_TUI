@@ -37,7 +37,7 @@ Provides an interactive terminal-based interface to view metrics collected by th
 Run the TUI:
 ```bash
 python tui.py
-
+```
 ## Screenshots
 <img width="1691" height="685" alt="{AB2A3753-A017-47D0-9111-8FFB95DF5E83}" src="https://github.com/user-attachments/assets/e65253a5-8c08-4c54-9ede-915abfb2f541" />
 
