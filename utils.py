@@ -57,7 +57,9 @@ def parse_storj_metrics(metrics):
         "monthly_egress_repair": "N/A",
         "monthly_egress_audit": "N/A",
         "monthly_egress_usage": "N/A",
-
+        "monthly_ingress_repair": "N/A",
+        "monthly_ingress_audit": "N/A",
+        "monthly_ingress_usage": "N/A",
     }
 
     satellite_info_ap1 = {
@@ -71,6 +73,9 @@ def parse_storj_metrics(metrics):
         "monthly_egress_repair": "N/A",
         "monthly_egress_audit": "N/A",
         "monthly_egress_usage": "N/A",
+        "monthly_ingress_repair": "N/A",
+        "monthly_ingress_audit": "N/A",
+        "monthly_ingress_usage": "N/A",
     }
 
     satellite_info_us1 = {
@@ -84,6 +89,9 @@ def parse_storj_metrics(metrics):
         "monthly_egress_repair": "N/A",
         "monthly_egress_audit": "N/A",
         "monthly_egress_usage": "N/A",
+        "monthly_ingress_repair": "N/A",
+        "monthly_ingress_audit": "N/A",
+        "monthly_ingress_usage": "N/A",
     }
     satellite_info_eu1 = {
         "satellitename": "N/A",
@@ -96,6 +104,9 @@ def parse_storj_metrics(metrics):
         "monthly_egress_repair": "N/A",
         "monthly_egress_audit": "N/A",
         "monthly_egress_usage": "N/A",
+        "monthly_ingress_repair": "N/A",
+        "monthly_ingress_audit": "N/A",
+        "monthly_ingress_usage": "N/A",
     }
 
     for line in metrics.splitlines():
