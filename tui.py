@@ -25,6 +25,8 @@ class NodeExporter2Bash(App):
         self.sat_info_eu1 = {"satellitename": "N/A", "storageSummary": "N/A", "bandwidthSummary": "N/A", "egressSummary": "N/A", "ingressSummary": "N/A", "disqualified": "N/A", "suspended": "N/A", "monthly_egress_repair": "N/A", "monthly_egress_audit": "N/A", "monthly_egress_usage": "N/A", "monthly_ingress_repair": "N/A", "monthly_ingress_usage": "N/A",}
         self.sat_info_ap1 = {"satellitename": "N/A", "storageSummary": "N/A", "bandwidthSummary": "N/A", "egressSummary": "N/A", "ingressSummary": "N/A", "disqualified": "N/A", "suspended": "N/A", "monthly_egress_repair": "N/A", "monthly_egress_audit": "N/A", "monthly_egress_usage": "N/A", "monthly_ingress_repair": "N/A", "monthly_ingress_usage": "N/A",}
         self.sat_info_us1 = {"satellitename": "N/A", "storageSummary": "N/A", "bandwidthSummary": "N/A", "egressSummary": "N/A", "ingressSummary": "N/A", "disqualified": "N/A", "suspended": "N/A", "monthly_egress_repair": "N/A", "monthly_egress_audit": "N/A", "monthly_egress_usage": "N/A", "monthly_ingress_repair": "N/A", "monthly_ingress_usage": "N/A",}
+        self.payout = {"egressBandwidth": "N/A", "egressBandwidthPayout": "N/A", "egressRepairAudit": "N/A", "egressRepairAuditPayout": "N/A", "diskSpace": "N/A", "diskSpacePayout": "N/A", "heldRate": "N/A", "payout": "N/A", "held": "N/A", "currentMonthExpectations": "N/A",}
+        
         self.connection_status = False
         self.background_task = None
         self.current_tab = None
@@ -48,6 +50,7 @@ class NodeExporter2Bash(App):
             yield Button("Node Info", id="nodeInfo", variant="primary")
             yield Button ("Disk Metrics", id="diskmetrics", variant="primary" )
             yield Button ("Satellites", id="satellites", variant="primary")
+            yield Button ("Payout",id="payout", variant="primary")
 
         self.popup = self.popup_container() # Popup to configure Node Exporter IP and Port
         self.body = Container(self.popup)
@@ -117,7 +120,59 @@ class NodeExporter2Bash(App):
         self.body.mount(centered_infobox)
 
 ##########################################
+    async def payout_tab(self):
+        self.current_tab = "payout"
+        self.body.remove_children()
+        self.body.styles.height = "85%"
+        self.body.styles.width = "100%"
 
+        #Title Styles
+        title = Static(" ******** Payout ********")
+        title.styles.bold = True
+        title.styles.text_align = "center"
+        title.styles.background = "black"
+        title.styles.color = "white"
+
+        #Info Elements
+
+        payout_info = self.payout
+
+        self.payout_egressbandwidth_static = Static(f"\nEgress Bandwidth: {payout_info["egressBandwidth"]}")
+        self.payout_egressbandwidthpayout_static = Static(f"Egress Bandwidth Payout: {payout_info["egressBandwidthPayout"]} USD")
+        self.payout_egressrepairaudit_static = Static(f"Egress Repair Audit: {payout_info["egressRepairAudit"]}")
+        self.payout_egressrepairauditpayout_static = Static(f"Egress Repair Audit Payout: {payout_info["egressRepairAuditPayout"]} USD")
+        self.payout_diskspace_static = Static(f"\nDisk Space: {payout_info["diskSpace"]}")
+        self.payout_diskspacepayout_static = Static(f"Disk Space Payout: {payout_info["diskSpacePayout"]} USD")
+        self.payout_heldrate_static = Static(f"\nHeld Rate: {payout_info["heldRate"]}")
+        self.payout_payout_static = Static(f"Payout: {payout_info["payout"]} USD")
+        self.payout_held_static = Static(f"Held: {payout_info["held"]} USD")
+        self.payout_currentmonthexpectations_static = Static(f"Current Month Expectations: {payout_info["currentMonthExpectations"]} USD")
+
+
+
+        payout_container = Container(
+            self.payout_egressbandwidth_static,
+            self.payout_egressbandwidthpayout_static,
+            self.payout_egressrepairaudit_static,
+            self.payout_egressrepairauditpayout_static,
+            self.payout_diskspace_static,
+            self.payout_diskspacepayout_static,
+            self.payout_heldrate_static,
+            self.payout_payout_static,
+            self.payout_held_static,
+            self.payout_currentmonthexpectations_static,
+        )
+
+        payout_container.styles.margin = (1,2)
+        payout_container.styles.padding = (1,2)
+        payout_container.styles.border = ("round", "green")
+
+
+        self.body.mount(title, payout_container)
+
+
+
+##########################################
     async def node_info(self):  # Container for Node Info TAB
         # Render the Node Info tab with wallet, nodeID, version and QUIC.
         self.current_tab = "node_info"
@@ -152,6 +207,7 @@ class NodeExporter2Bash(App):
 
         info_container.styles.margin = (1, 2)
         info_container.styles.padding = (1,2)
+        info_container.styles.border = ("round", "green")
 
         self.body.mount(title)
         self.body.mount(info_container)
@@ -177,6 +233,8 @@ class NodeExporter2Bash(App):
         title.styles.text_align = "center"
         title.styles.background = "black"
         title.styles.color = "white"
+
+
 
         #Container Elements
         used_disk_static = Static(f'Used Space: {disk_metrics["used"]} GB')
@@ -234,6 +292,8 @@ class NodeExporter2Bash(App):
 
         disk_metrics_container.styles.margin = (1,2)
         disk_metrics_container.styles.padding = (1,2)
+        disk_metrics_container.styles.border = ("round", "green")
+
 
         self.body.mount(title)
         self.body.mount(disk_metrics_container)
@@ -271,11 +331,11 @@ class NodeExporter2Bash(App):
         self.eu1_sat_ingresssum_static = Static(f"Ingress Summary: {eu1["ingressSummary"]} GB")
         self.eu1_sat_disqualified_static = Static(f"Disqualified Status: {eu1["disqualified"]}")
         self.eu1_sat_suspended_static = Static(f"Suspended Status: {eu1["suspended"]}")
-        self.eu1_sat_month_egress_repair_static = Static(f"\nMonthly Egress Repair: {eu1["monthly_egress_repair"]}")
-        self.eu1_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {eu1["monthly_egress_audit"]}")
-        self.eu1_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {eu1["monthly_egress_usage"]}")
-        self.eu1_sat_month_ingress_repair_static = Static(f"\nMonthly Ingress Repair: {eu1["monthly_ingress_repair"]}")
-        self.eu1_sat_month_ingress_usage_static = Static(f"Monthly Ingress Usage: {eu1["monthly_ingress_usage"]}") 
+        self.eu1_sat_month_egress_repair_static = Static(f"\nMonthly Egress Repair: {eu1["monthly_egress_repair"]} GB")
+        self.eu1_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {eu1["monthly_egress_audit"]} GB")
+        self.eu1_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {eu1["monthly_egress_usage"]} GB")
+        self.eu1_sat_month_ingress_repair_static = Static(f"\nMonthly Ingress Repair: {eu1["monthly_ingress_repair"]} GB")
+        self.eu1_sat_month_ingress_usage_static = Static(f"Monthly Ingress Usage: {eu1["monthly_ingress_usage"]} GB") 
 
 
 
@@ -343,11 +403,11 @@ class NodeExporter2Bash(App):
         self.saltlake_sat_ingresssum_static = Static(f"Ingress Summary: {saltlake["ingressSummary"]} GB")
         self.saltlake_sat_disqualified_static = Static(f"Disqualified Status: {saltlake["disqualified"]}")
         self.saltlake_sat_suspended_static = Static(f"Suspended Status: {saltlake["suspended"]}")
-        self.saltlake_sat_month_egress_repair_static = Static(f"Monthly Egress Repair: {saltlake["monthly_egress_repair"]}")
-        self.saltlake_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {saltlake["monthly_egress_audit"]}")
-        self.saltlake_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {saltlake["monthly_egress_usage"]}")
-        self.saltlake_sat_month_ingress_repair_static = Static(f"Monthly Ingress Repair: {saltlake["monthly_ingress_repair"]}")
-        self.saltlake_sat_month_ingress_usage_static = Static(f"Monthly Ingress Usage: {saltlake["monthly_ingress_usage"]}")
+        self.saltlake_sat_month_egress_repair_static = Static(f"Monthly Egress Repair: {saltlake["monthly_egress_repair"]} GB")
+        self.saltlake_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {saltlake["monthly_egress_audit"]} GB")
+        self.saltlake_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {saltlake["monthly_egress_usage"]} GB")
+        self.saltlake_sat_month_ingress_repair_static = Static(f"Monthly Ingress Repair: {saltlake["monthly_ingress_repair"]} GB")
+        self.saltlake_sat_month_ingress_usage_static = Static(f"Monthly Ingress Usage: {saltlake["monthly_ingress_usage"]} GB")
 
 
         # Satellite info container (labels on the right panel)
@@ -370,6 +430,7 @@ class NodeExporter2Bash(App):
         #Container Styles
         container.styles.margin = (1,2)
         container.styles.padding = (1,2)
+        container.styles.border = ("round", "green")
 
 
         row = Horizontal(
@@ -414,11 +475,11 @@ class NodeExporter2Bash(App):
         self.us1_sat_ingresssum_static = Static(f"Ingress Summary: {us1['ingressSummary']} GB")
         self.us1_sat_disqualified_static = Static(f"Disqualified Status: {us1['disqualified']}")
         self.us1_sat_suspended_static = Static(f"Suspended Status: {us1['suspended']}")
-        self.us1_sat_month_egress_repair_static = Static(f"Monthly Egress Repair: {us1['monthly_egress_repair']}")
-        self.us1_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {us1['monthly_egress_audit']}")
-        self.us1_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {us1['monthly_egress_usage']}")
-        self.us1_sat_month_ingress_repair_static = Static(f"Monthly Ingress Repair: {us1['monthly_ingress_repair']}")
-        self.us1_sat_month_ingress_usage_static = Static(f"Monthly Ingress Usage: {us1['monthly_ingress_usage']}")
+        self.us1_sat_month_egress_repair_static = Static(f"Monthly Egress Repair: {us1['monthly_egress_repair']} GB")
+        self.us1_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {us1['monthly_egress_audit']} GB")
+        self.us1_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {us1['monthly_egress_usage']} GB")
+        self.us1_sat_month_ingress_repair_static = Static(f"Monthly Ingress Repair: {us1['monthly_ingress_repair']} GB")
+        self.us1_sat_month_ingress_usage_static = Static(f"Monthly Ingress Usage: {us1['monthly_ingress_usage']} GB")
 
         # container for labels
         container = Container(
@@ -441,6 +502,7 @@ class NodeExporter2Bash(App):
         #Container Styles
         container.styles.margin = (1,2)
         container.styles.padding = (1,2)
+        container.styles.border = ("round", "green")
 
         row = Horizontal(
             button_return,
@@ -449,8 +511,6 @@ class NodeExporter2Bash(App):
         )
 
         self.body.mount(title, row)
-
-
 
 #############
     async def sat_ap1(self):
@@ -485,11 +545,11 @@ class NodeExporter2Bash(App):
         self.ap1_sat_ingresssum_static = Static(f"Ingress Summary: {ap1["ingressSummary"]} GB")
         self.ap1_sat_disqualified_static = Static(f"Disqualified Status: {ap1["disqualified"]}")
         self.ap1_sat_suspended_static = Static(f"Suspended Status: {ap1["suspended"]}")
-        self.ap1_sat_month_egress_repair_static = Static(f"Monthly Egress Repair: {ap1["monthly_egress_repair"]}")
-        self.ap1_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {ap1["monthly_egress_audit"]}")
-        self.ap1_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {ap1["monthly_egress_usage"]}")
-        self.ap1_sat_month_ingress_repair_static = Static(f"Monthly Ingress Repair: {ap1["monthly_ingress_repair"]}")
-        self.ap1_sat_month_ingress_usage_static = Static(f"Monthly Ingress Usage: {ap1["monthly_ingress_usage"]}")
+        self.ap1_sat_month_egress_repair_static = Static(f"Monthly Egress Repair: {ap1["monthly_egress_repair"]} GB")
+        self.ap1_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {ap1["monthly_egress_audit"]} GB")
+        self.ap1_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {ap1["monthly_egress_usage"]} GB")
+        self.ap1_sat_month_ingress_repair_static = Static(f"Monthly Ingress Repair: {ap1["monthly_ingress_repair"]} GB")
+        self.ap1_sat_month_ingress_usage_static = Static(f"Monthly Ingress Usage: {ap1["monthly_ingress_usage"]} GB")
 
 
         # Satellite info container (labels on the right panel)
@@ -512,7 +572,7 @@ class NodeExporter2Bash(App):
         #Container Styles
         container.styles.margin = (1,2)
         container.styles.padding = (1,2)
-
+        container.styles.border = ("round", "green")
 
         row = Horizontal(
             button_return,
@@ -639,6 +699,8 @@ class NodeExporter2Bash(App):
             await self.sat_eu1()
         elif event.button.id == "sat_us1":
             await self.sat_us1()
+        elif event.button.id == "payout":
+            await self.payout_tab()
 
 ##########################################        
     async def background_data_fetcher(self):  # Fetches Data in the background
@@ -655,7 +717,12 @@ class NodeExporter2Bash(App):
                         None, get_storj_metrics, self.static_ip, self.static_port
                     )
                     if metrics:
-                        self.sat_info_eu1, self.disk_metrics_data, self.node_data ,self.sat_info_ap1,self.sat_info_saltlake, self.sat_info_us1 = parse_storj_metrics(metrics)
+                        try:
+                            self.sat_info_eu1, self.disk_metrics_data, self.node_data ,self.sat_info_ap1,self.sat_info_saltlake, self.sat_info_us1, self.payout = parse_storj_metrics(metrics)
+                        except Exception as e:
+                            print(f"Error parsing metrics: {e}")
+                            # Keep default values if there's an error
+                            pass
 
                 self._set_footer_status(self.connection_status)
 
@@ -691,22 +758,22 @@ class NodeExporter2Bash(App):
 
                     # Monthly Egress Stats
                     if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_month_egress_repair_static"):
-                        self.saltlake_sat_month_egress_repair_static.update(f"\nMonthly Egress Repair: {self.sat_info_saltlake['monthly_egress_repair']}")
+                        self.saltlake_sat_month_egress_repair_static.update(f"\nMonthly Egress Repair: {self.sat_info_saltlake['monthly_egress_repair']} GB")
 
                     if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_month_egress_audit_static"):
-                        self.saltlake_sat_month_egress_audit_static.update(f"Monthly Egress Audit: {self.sat_info_saltlake['monthly_egress_audit']}")
+                        self.saltlake_sat_month_egress_audit_static.update(f"Monthly Egress Audit: {self.sat_info_saltlake['monthly_egress_audit']} GB")
 
                     if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_month_egress_usage_static"):
-                        self.saltlake_sat_month_egress_usage_static.update(f"Monthly Egress Usage: {self.sat_info_saltlake['monthly_egress_usage']}")
+                        self.saltlake_sat_month_egress_usage_static.update(f"Monthly Egress Usage: {self.sat_info_saltlake['monthly_egress_usage']} GB")
                     # Monthly Ingress Stats
                     if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_month_ingress_repair_static"):
-                        self.saltlake_sat_month_ingress_repair_static.update(f"\nMonthly Ingress Repair: {self.sat_info_saltlake['monthly_ingress_repair']}")
+                        self.saltlake_sat_month_ingress_repair_static.update(f"\nMonthly Ingress Repair: {self.sat_info_saltlake['monthly_ingress_repair']} GB")
 
                     if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_month_ingress_audit_static"):
-                        self.saltlake_sat_month_ingress_audit_static.update(f"Monthly Ingress Audit: {self.sat_info_saltlake['monthly_ingress_audit']}")
+                        self.saltlake_sat_month_ingress_audit_static.update(f"Monthly Ingress Audit: {self.sat_info_saltlake['monthly_ingress_audit']} GB")
 
                     if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_month_ingress_usage_static"):
-                        self.saltlake_sat_month_ingress_usage_static.update(f"Monthly Ingress Usage: {self.sat_info_saltlake['monthly_ingress_usage']}")
+                        self.saltlake_sat_month_ingress_usage_static.update(f"Monthly Ingress Usage: {self.sat_info_saltlake['monthly_ingress_usage']} GB")
 
 
 
@@ -733,19 +800,19 @@ class NodeExporter2Bash(App):
 
 
                     if self.current_tab == "sat_eu1" and hasattr(self, "\neu1_sat_month_egress_repair_static"):
-                        self.eu1_sat_month_egress_repair_static.update(f"Monthly Egress Repair: {self.sat_info_eu1['monthly_egress_repair']}")
+                        self.eu1_sat_month_egress_repair_static.update(f"Monthly Egress Repair: {self.sat_info_eu1['monthly_egress_repair']} GB")
                     if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_month_egress_audit_static"):
-                        self.eu1_sat_month_egress_audit_static.update(f"Monthly Egress Audit: {self.sat_info_eu1['monthly_egress_audit']}")
+                        self.eu1_sat_month_egress_audit_static.update(f"Monthly Egress Audit: {self.sat_info_eu1['monthly_egress_audit']} GB")
                     if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_month_egress_usage_static"):
-                        self.eu1_sat_month_egress_usage_static.update(f"Monthly Egress Usage: {self.sat_info_eu1['monthly_egress_usage']}")
+                        self.eu1_sat_month_egress_usage_static.update(f"Monthly Egress Usage: {self.sat_info_eu1['monthly_egress_usage']} GB")
                 
 
                     if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_month_ingress_repair_static"):
-                        self.eu1_sat_month_ingress_repair_static.update(f"\nMonthly Ingress Repair: {self.sat_info_eu1['monthly_ingress_repair']}")
+                        self.eu1_sat_month_ingress_repair_static.update(f"\nMonthly Ingress Repair: {self.sat_info_eu1['monthly_ingress_repair']} GB")
 
 
                     if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_month_ingress_usage_static"):
-                        self.eu1_sat_month_ingress_usage_static.update(f"Monthly Ingress Usage: {self.sat_info_eu1['monthly_ingress_usage']}")
+                        self.eu1_sat_month_ingress_usage_static.update(f"Monthly Ingress Usage: {self.sat_info_eu1['monthly_ingress_usage']} GB")
 
 
                     ###########
@@ -770,21 +837,21 @@ class NodeExporter2Bash(App):
 
                     # Monthly Egress Stats
                     if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_month_egress_repair_static"):
-                        self.us1_sat_month_egress_repair_static.update(f"\nMonthly Egress Repair: {self.sat_info_us1['monthly_egress_repair']}")
+                        self.us1_sat_month_egress_repair_static.update(f"\nMonthly Egress Repair: {self.sat_info_us1['monthly_egress_repair']} GB")
 
                     if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_month_egress_audit_static"):
-                        self.us1_sat_month_egress_audit_static.update(f"Monthly Egress Audit: {self.sat_info_us1['monthly_egress_audit']}")
+                        self.us1_sat_month_egress_audit_static.update(f"Monthly Egress Audit: {self.sat_info_us1['monthly_egress_audit']} GB")
 
                     if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_month_egress_usage_static"):
-                        self.us1_sat_month_egress_usage_static.update(f"Monthly Egress Usage: {self.sat_info_us1['monthly_egress_usage']}")
+                        self.us1_sat_month_egress_usage_static.update(f"Monthly Egress Usage: {self.sat_info_us1['monthly_egress_usage']} GB")
 
                     # Monthly Ingress Stats
                     if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_month_ingress_repair_static"):
-                        self.us1_sat_month_ingress_repair_static.update(f"\nMonthly Ingress Repair: {self.sat_info_us1['monthly_ingress_repair']}")
+                        self.us1_sat_month_ingress_repair_static.update(f"\nMonthly Ingress Repair: {self.sat_info_us1['monthly_ingress_repair']} GB")
 
 
                     if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_month_ingress_usage_static"):
-                        self.us1_sat_month_ingress_usage_static.update(f"Monthly Ingress Usage: {self.sat_info_us1['monthly_ingress_usage']}")
+                        self.us1_sat_month_ingress_usage_static.update(f"Monthly Ingress Usage: {self.sat_info_us1['monthly_ingress_usage']} GB")
 
 
 
@@ -819,22 +886,56 @@ class NodeExporter2Bash(App):
 
                     # Monthly Egress Stats
                     if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_month_egress_repair_static"):
-                        self.ap1_sat_month_egress_repair_static.update(f"\nMonthly Egress Repair: {self.sat_info_ap1["monthly_egress_repair"]}")
+                        self.ap1_sat_month_egress_repair_static.update(f"\nMonthly Egress Repair: {self.sat_info_ap1["monthly_egress_repair"]} GB")
 
                     if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_month_egress_audit_static"):
-                        self.ap1_sat_month_egress_audit_static.update(f"Monthly Egress Audit: {self.sat_info_ap1["monthly_egress_audit"]}")
+                        self.ap1_sat_month_egress_audit_static.update(f"Monthly Egress Audit: {self.sat_info_ap1["monthly_egress_audit"]} GB")
 
                     if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_month_egress_usage_static"):
-                        self.ap1_sat_month_egress_usage_static.update(f"Monthly Egress Usage: {self.sat_info_ap1["monthly_egress_usage"]}")
+                        self.ap1_sat_month_egress_usage_static.update(f"Monthly Egress Usage: {self.sat_info_ap1["monthly_egress_usage"]} GB")
 
                     # Monthly Ingress Stats
                     if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_month_ingress_repair_static"):
-                        self.ap1_sat_month_ingress_repair_static.update(f"\nMonthly Ingress Repair: {self.sat_info_ap1["monthly_ingress_repair"]}")
+                        self.ap1_sat_month_ingress_repair_static.update(f"\nMonthly Ingress Repair: {self.sat_info_ap1["monthly_ingress_repair"]} GB")
 
                     if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_month_ingress_usage_static"):
-                        self.ap1_sat_month_ingress_usage_static.update(f"Monthly Ingress Usage: {self.sat_info_ap1["monthly_ingress_usage"]}")
+                        self.ap1_sat_month_ingress_usage_static.update(f"Monthly Ingress Usage: {self.sat_info_ap1["monthly_ingress_usage"]} GB")
 
-                        
+                    ##########################
+                    #Payout Labels
+
+                    if self.current_tab == "payout" and hasattr(self, "payout_egressbandwidth_static"):
+                        self.payout_egressbandwidth_static.update(f"\nEgress Bandwidth: {self.payout["egressBandwidth"]}")
+
+                    if self.current_tab == "payout" and hasattr(self, "payout_egressbandwidthpayout_static"):
+                        self.payout_egressbandwidthpayout_static.update(f"Egress Bandwidth Payout: {self.payout["egressBandwidthPayout"]} USD")
+
+                    if self.current_tab == "payout" and hasattr(self, "payout_egressrepairaudit_static"):
+                        self.payout_egressrepairaudit_static.update(f"Egress Repair Audit: {self.payout["egressRepairAudit"]}")
+
+                    if self.current_tab == "payout" and hasattr(self, "payout_egressrepairauditpayout_static"):
+                        self.payout_egressrepairauditpayout_static.update(f"Egress Repair Audit Payout: {self.payout["egressRepairAuditPayout"]} USD")
+
+                    if self.current_tab == "payout" and hasattr(self, "payout_diskspace_static"):
+                        self.payout_diskspace_static.update(f"\nDisk Space: {self.payout["diskSpace"]}")
+
+                    if self.current_tab == "payout" and hasattr(self, "payout_diskspacepayout_static"):
+                        self.payout_diskspacepayout_static.update(f"Disk Space Payout: {self.payout["diskSpacePayout"]} USD")
+
+                    if self.current_tab == "payout" and hasattr(self, "payout_heldrate_static"):
+                        self.payout_heldrate_static.update(f"\nHeld Rate: {self.payout["heldRate"]}")
+
+                    if self.current_tab == "payout" and hasattr(self, "payout_payout_static"):
+                        self.payout_payout_static.update(f"Payout: {self.payout["payout"]} USD")
+
+                    if self.current_tab == "payout" and hasattr(self, "payout_held_static"):
+                        self.payout_held_static.update(f"Held: {self.payout["held"]} USD")
+
+                    if self.current_tab == "payout" and hasattr(self, "payout_currentmonthexpectations_static"):
+                        self.payout_currentmonthexpectations_static.update(f"Current Month Expectations: {self.payout["currentMonthExpectations"]} USD")
+
+                    ##########################
+
                     
                     ######################
 

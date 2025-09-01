@@ -109,6 +109,20 @@ def parse_storj_metrics(metrics):
         "monthly_ingress_usage": "N/A",
     }
 
+    payout = {
+        "egressBandwidth": "N/A",
+        "egressBandwidthPayout": "N/A",
+        "egressRepairAudit": "N/A",
+        "egressRepairAuditPayout": "N/A",
+        "diskSpace": "N/A",
+        "diskSpacePayout": "N/A",
+        "heldRate": "N/A",
+        "payout": "N/A",
+        "held": "N/A",
+        "currentMonthExpectations": "N/A",                 
+    }
+
+
     for line in metrics.splitlines():
 
         #Node Info
@@ -200,6 +214,7 @@ def parse_storj_metrics(metrics):
                     satellite_info_us1["satellitename"] = line.split('url="')[1].split('"')[0]
 
             if "12EayRS2V1kEsWESU9QMRseFhdxYxKicsiFmxrsLZHeLUtdps3S" in line and "storageSummary" in line:
+                
                     satellite_info_us1["storageSummary"] = line.split()[-1]
 
             if "12EayRS2V1kEsWESU9QMRseFhdxYxKicsiFmxrsLZHeLUtdps3S" in line and "bandwidthSummary" in line:
@@ -300,16 +315,6 @@ def parse_storj_metrics(metrics):
                 elif "eu1" in line:
                     satellite_info_eu1["monthly_ingress_repair"] = line.split()[-1]
             
-            #Audit
-            if 'type="audit"' in line:
-                if "saltlake" in line:
-                    satellite_info_saltlake["monthly_ingress_audit"] = line.split()[-1]
-                elif "ap1" in line:
-                    satellite_info_ap1["monthly_ingress_audit"] = line.split()[-1]
-                elif "us1" in line:
-                    satellite_info_us1["monthly_ingress_audit"] = line.split()[-1]
-                elif "eu1" in line:
-                    satellite_info_eu1["monthly_ingress_audit"] = line.split()[-1]
 
             #Usage
             if 'type="usage"' in line:
@@ -322,8 +327,49 @@ def parse_storj_metrics(metrics):
                 elif "eu1" in line:
                     satellite_info_eu1["monthly_ingress_usage"] = line.split()[-1]
 
-                    
-    return satellite_info_eu1, disk_metrics, node_info, satellite_info_ap1, satellite_info_saltlake, satellite_info_us1
+        # Payout
+        if "storj_payout_currentMonth" in line:
+            try:
+                if 'type="egressBandwidth"' in line:
+                    # Convert bytes to GB for better readability
+                    bytes_val = float(line.split()[-1])
+                    payout["egressBandwidth"] = f"{bytes_val / (1024**3):.2f} GB"
+                if 'type="egressBandwidthPayout"' in line:
+                     payout["egressBandwidthPayout"] = line.split()[-1]
+                if 'type="egressRepairAudit"' in line:
+                    # Convert bytes to GB for better readability
+                    bytes_val = float(line.split()[-1])
+                    payout["egressRepairAudit"] = f"{bytes_val / (1024**3):.2f} GB"
+                if 'type="egressRepairAuditPayout"' in line:
+                     payout["egressRepairAuditPayout"] = line.split()[-1]
+                if 'type="diskSpace"' in line:
+                    # Convert bytes to GB for better readability
+                    bytes_val = float(line.split()[-1])
+                    payout["diskSpace"] = f"{bytes_val / (1024**3):.2f} GB"
+                if 'type="diskSpacePayout"' in line:
+                     payout["diskSpacePayout"] = f"{float(line.split()[-1]):.3f}"
+                if 'type="heldRate"' in line:
+                     payout["heldRate"] = line.split()[-1]
+                if 'type="payout"' in line:
+                     payout["payout"] = f"{float(line.split()[-1]):.3f}"
+                if 'type="held"' in line:
+                     payout["held"] = line.split()[-1]
+                if 'type="currentMonthExpectations"' in line:
+                     payout["currentMonthExpectations"] = line.split()[-1]
+            except Exception as e:
+                print(f"Error processing payout line: {line}, error: {e}")
+
+
+
+
+
+
+
+
+
+
+
+    return satellite_info_eu1, disk_metrics, node_info, satellite_info_ap1, satellite_info_saltlake, satellite_info_us1, payout
    # satellite_info_saltlake
     # return node_info, disk_metrics satellite_info_saltlake
 
