@@ -51,6 +51,7 @@ class NodeExporter2Bash(App):
             yield Button ("Disk Metrics", id="diskmetrics", variant="primary" )
             yield Button ("Satellites", id="satellites", variant="primary")
             yield Button ("Payout",id="payout", variant="primary")
+            yield Button ("About", id="about", variant="primary")
 
         self.popup = self.popup_container() # Popup to configure Node Exporter IP and Port
         self.body = Container(self.popup)
@@ -72,6 +73,32 @@ class NodeExporter2Bash(App):
         
 
 #### TABS ####
+    def about_tab(self):
+        self.current_tab = "about"
+        self.body.remove_children()
+        self.body.styles.height = "85%"
+        self.body.styles.width = "100%"
+
+        title = Static(" ******** About ********")
+        title.styles.bold = True
+        title.styles.text_align = "center"
+        title.styles.background = "black"
+        title.styles.color = "white"
+
+        about_text = Static("""This TUI application allows you to monitor your Storj Node Exporter service.
+It provides multiple tabs to visualize exporter connectivity, node information, disk metrics, and satellite details.
+The application is built using the Textual framework and runs in your terminal.
+Uses the /metrics endpoint of the Node Exporter service by anclrii to fetch data.
+Developed by W0lf13 - https://github.com/vvolfie
+                            """)
+        
+        about_text.styles.padding = (1,2)
+        about_text.styles.text_align = "center"
+        
+        self.body.mount(title, about_text)
+
+
+
     async def node_exporter_info_tab(self):  # Container for Node Exporter Info TAB
         # Render the Node Exporter connectivity tab.
         # Shows current ONLINE/OFFLINE state, configured IP/Port and a
@@ -169,8 +196,6 @@ class NodeExporter2Bash(App):
 
 
         self.body.mount(title, payout_container)
-
-
 
 ##########################################
     async def node_info(self):  # Container for Node Info TAB
@@ -701,6 +726,8 @@ class NodeExporter2Bash(App):
             await self.sat_us1()
         elif event.button.id == "payout":
             await self.payout_tab()
+        elif event.button.id == "about":
+            self.about_tab()
 
 ##########################################        
     async def background_data_fetcher(self):  # Fetches Data in the background
