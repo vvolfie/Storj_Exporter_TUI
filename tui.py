@@ -1,8 +1,8 @@
-from ast import Continue
+
 from select import select
 from textual import on
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, Button, Input, Select, Static
+from textual.widgets import Button, Input, Static
 from textual.containers import Horizontal, Container, Vertical, Center
 from utils import *
 import asyncio
@@ -349,12 +349,12 @@ Developed by W0lf13 - https://github.com/vvolfie
         # Grab current satellite info snapshot
         eu1 = self.sat_info_eu1
 
-        self.eu1_sat_name_static = Static(f"\nSatellite: {eu1["satellitename"]}")
-        self.eu1_sat_storagesum_static = Static(f"Storage Summary: {eu1["storageSummary"]} GB")
+        self.eu1_sat_name_static = Static(f"Satellite: {eu1["satellitename"]}")
+        self.eu1_sat_storagesum_static = Static(f"\nStorage Summary: {eu1["storageSummary"]} GB")
         self.eu1_sat_bandwithsum_static =  Static(f"Bandwith Summary: {eu1["bandwidthSummary"]} GB")
         self.eu1_sat_egresssum_static = Static(f"Egress Summary: {eu1["egressSummary"]} GB")
         self.eu1_sat_ingresssum_static = Static(f"Ingress Summary: {eu1["ingressSummary"]} GB")
-        self.eu1_sat_disqualified_static = Static(f"Disqualified Status: {eu1["disqualified"]}")
+        self.eu1_sat_disqualified_static = Static(f"\nDisqualified Status: {eu1["disqualified"]}")
         self.eu1_sat_suspended_static = Static(f"Suspended Status: {eu1["suspended"]}")
         self.eu1_sat_month_egress_repair_static = Static(f"\nMonthly Egress Repair: {eu1["monthly_egress_repair"]} GB")
         self.eu1_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {eu1["monthly_egress_audit"]} GB")
@@ -422,16 +422,16 @@ Developed by W0lf13 - https://github.com/vvolfie
         saltlake = self.sat_info_saltlake
 
         self.saltlake_sat_name_static = Static(f"Satellite: {saltlake["satellitename"]}")
-        self.saltlake_sat_storagesum_static = Static(f"Storage Summary: {saltlake["storageSummary"]} GB")
+        self.saltlake_sat_storagesum_static = Static(f"\nStorage Summary: {saltlake["storageSummary"]} GB")
         self.saltlake_sat_bandwithsum_static =  Static(f"Bandwith Summary: {saltlake["bandwidthSummary"]} GB")
         self.saltlake_sat_egresssum_static = Static(f"Egress Summary: {saltlake["egressSummary"]} GB")
         self.saltlake_sat_ingresssum_static = Static(f"Ingress Summary: {saltlake["ingressSummary"]} GB")
-        self.saltlake_sat_disqualified_static = Static(f"Disqualified Status: {saltlake["disqualified"]}")
+        self.saltlake_sat_disqualified_static = Static(f"\nDisqualified Status: {saltlake["disqualified"]}")
         self.saltlake_sat_suspended_static = Static(f"Suspended Status: {saltlake["suspended"]}")
-        self.saltlake_sat_month_egress_repair_static = Static(f"Monthly Egress Repair: {saltlake["monthly_egress_repair"]} GB")
+        self.saltlake_sat_month_egress_repair_static = Static(f"\nMonthly Egress Repair: {saltlake["monthly_egress_repair"]} GB")
         self.saltlake_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {saltlake["monthly_egress_audit"]} GB")
         self.saltlake_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {saltlake["monthly_egress_usage"]} GB")
-        self.saltlake_sat_month_ingress_repair_static = Static(f"Monthly Ingress Repair: {saltlake["monthly_ingress_repair"]} GB")
+        self.saltlake_sat_month_ingress_repair_static = Static(f"\nMonthly Ingress Repair: {saltlake["monthly_ingress_repair"]} GB")
         self.saltlake_sat_month_ingress_usage_static = Static(f"Monthly Ingress Usage: {saltlake["monthly_ingress_usage"]} GB")
 
 
@@ -494,16 +494,16 @@ Developed by W0lf13 - https://github.com/vvolfie
         us1 = self.sat_info_us1
 
         self.us1_sat_name_static = Static(f"Satellite: {us1['satellitename']}")
-        self.us1_sat_storagesum_static = Static(f"Storage Summary: {us1['storageSummary']} GB")
+        self.us1_sat_storagesum_static = Static(f"\nStorage Summary: {us1['storageSummary']} GB")
         self.us1_sat_bandwithsum_static = Static(f"Bandwith Summary: {us1['bandwidthSummary']} GB")
         self.us1_sat_egresssum_static = Static(f"Egress Summary: {us1['egressSummary']} GB")
         self.us1_sat_ingresssum_static = Static(f"Ingress Summary: {us1['ingressSummary']} GB")
-        self.us1_sat_disqualified_static = Static(f"Disqualified Status: {us1['disqualified']}")
+        self.us1_sat_disqualified_static = Static(f"\nDisqualified Status: {us1['disqualified']}")
         self.us1_sat_suspended_static = Static(f"Suspended Status: {us1['suspended']}")
-        self.us1_sat_month_egress_repair_static = Static(f"Monthly Egress Repair: {us1['monthly_egress_repair']} GB")
+        self.us1_sat_month_egress_repair_static = Static(f"\nMonthly Egress Repair: {us1['monthly_egress_repair']} GB")
         self.us1_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {us1['monthly_egress_audit']} GB")
         self.us1_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {us1['monthly_egress_usage']} GB")
-        self.us1_sat_month_ingress_repair_static = Static(f"Monthly Ingress Repair: {us1['monthly_ingress_repair']} GB")
+        self.us1_sat_month_ingress_repair_static = Static(f"\nMonthly Ingress Repair: {us1['monthly_ingress_repair']} GB")
         self.us1_sat_month_ingress_usage_static = Static(f"Monthly Ingress Usage: {us1['monthly_ingress_usage']} GB")
 
         # container for labels
@@ -564,16 +564,16 @@ Developed by W0lf13 - https://github.com/vvolfie
         ap1 = self.sat_info_ap1
 
         self.ap1_sat_name_static = Static(f"Satellite: {ap1["satellitename"]}")
-        self.ap1_sat_storagesum_static = Static(f"Storage Summary: {ap1["storageSummary"]} GB")
+        self.ap1_sat_storagesum_static = Static(f"\nStorage Summary: {ap1["storageSummary"]} GB")
         self.ap1_sat_bandwithsum_static =  Static(f"Bandwith Summary: {ap1["bandwidthSummary"]} GB")
         self.ap1_sat_egresssum_static = Static(f"Egress Summary: {ap1["egressSummary"]} GB")
         self.ap1_sat_ingresssum_static = Static(f"Ingress Summary: {ap1["ingressSummary"]} GB")
-        self.ap1_sat_disqualified_static = Static(f"Disqualified Status: {ap1["disqualified"]}")
+        self.ap1_sat_disqualified_static = Static(f"\nDisqualified Status: {ap1["disqualified"]}")
         self.ap1_sat_suspended_static = Static(f"Suspended Status: {ap1["suspended"]}")
-        self.ap1_sat_month_egress_repair_static = Static(f"Monthly Egress Repair: {ap1["monthly_egress_repair"]} GB")
+        self.ap1_sat_month_egress_repair_static = Static(f"\nMonthly Egress Repair: {ap1["monthly_egress_repair"]} GB")
         self.ap1_sat_month_egress_audit_static = Static(f"Monthly Egress Audit: {ap1["monthly_egress_audit"]} GB")
         self.ap1_sat_month_egress_usage_static = Static(f"Monthly Egress Usage: {ap1["monthly_egress_usage"]} GB")
-        self.ap1_sat_month_ingress_repair_static = Static(f"Monthly Ingress Repair: {ap1["monthly_ingress_repair"]} GB")
+        self.ap1_sat_month_ingress_repair_static = Static(f"\nMonthly Ingress Repair: {ap1["monthly_ingress_repair"]} GB")
         self.ap1_sat_month_ingress_usage_static = Static(f"Monthly Ingress Usage: {ap1["monthly_ingress_usage"]} GB")
 
 
@@ -729,6 +729,7 @@ Developed by W0lf13 - https://github.com/vvolfie
         elif event.button.id == "about":
             self.about_tab()
 
+
 ##########################################        
     async def background_data_fetcher(self):  # Fetches Data in the background
         # Background loop to test connectivity and refresh metrics.
@@ -763,10 +764,10 @@ Developed by W0lf13 - https://github.com/vvolfie
                     ########
                     # Satellites (Saltlake) labels
                     if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_name_static"):
-                        self.saltlake_sat_name_static.update(f"\nSatellite: {self.sat_info_saltlake['satellitename']}")
+                        self.saltlake_sat_name_static.update(f"Satellite: {self.sat_info_saltlake['satellitename']}")
 
                     if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_storagesum_static"):
-                        self.saltlake_sat_storagesum_static.update(f"Storage Summary: {self.sat_info_saltlake['storageSummary']} GB")
+                        self.saltlake_sat_storagesum_static.update(f"\nStorage Summary: {self.sat_info_saltlake['storageSummary']} GB")
                     
                     if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_bandwithsum_static"):
                         self.saltlake_sat_bandwithsum_static.update(f"Bandwith Summary: {self.sat_info_saltlake['bandwidthSummary']} GB")
@@ -778,7 +779,7 @@ Developed by W0lf13 - https://github.com/vvolfie
                         self.saltlake_sat_ingresssum_static.update(f"Ingress Summary: {self.sat_info_saltlake['ingressSummary']} GB")
                     
                     if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_disqualified_static"):
-                        self.saltlake_sat_disqualified_static.update(f"Disqualified Status: {self.sat_info_saltlake['disqualified']}")
+                        self.saltlake_sat_disqualified_static.update(f"\nDisqualified Status: {self.sat_info_saltlake['disqualified']}")
                     
                     if self.current_tab == "sat_saltlake" and hasattr(self, "saltlake_sat_suspended_static"):
                         self.saltlake_sat_suspended_static.update(f"Suspended Status: {self.sat_info_saltlake['suspended']}")
@@ -810,18 +811,24 @@ Developed by W0lf13 - https://github.com/vvolfie
 
                     #EU1 labels
 
-                    if self.current_tab == "sat_eu1" and hasattr(self, "\neu1_sat_name_static"):
+                    if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_name_static"):
                         self.eu1_sat_name_static.update(f"Satellite: {self.sat_info_eu1['satellitename']}")
+
                     if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_storagesum_static"):
-                        self.eu1_sat_storagesum_static.update(f"Storage Summary: {self.sat_info_eu1['storageSummary']} GB")
+                        self.eu1_sat_storagesum_static.update(f"\nStorage Summary: {self.sat_info_eu1['storageSummary']} GB")
+
                     if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_bandwithsum_static"):
                         self.eu1_sat_bandwithsum_static.update(f"Bandwith Summary: {self.sat_info_eu1['bandwidthSummary']} GB")
+
                     if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_egresssum_static"):
                         self.eu1_sat_egresssum_static.update(f"Egress Summary: {self.sat_info_eu1['egressSummary']} GB")
+
                     if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_ingresssum_static"):
                         self.eu1_sat_ingresssum_static.update(f"Ingress Summary: {self.sat_info_eu1['ingressSummary']} GB")
+
                     if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_disqualified_static"):
-                        self.eu1_sat_disqualified_static.update(f"Disqualified Status: {self.sat_info_eu1['disqualified']}")
+                        self.eu1_sat_disqualified_static.update(f"\nDisqualified Status: {self.sat_info_eu1['disqualified']}")
+
                     if self.current_tab == "sat_eu1" and hasattr(self, "eu1_sat_suspended_static"):
                         self.eu1_sat_suspended_static.update(f"Suspended Status: {self.sat_info_eu1['suspended']}")
 
@@ -847,9 +854,9 @@ Developed by W0lf13 - https://github.com/vvolfie
                     # US1 labels
 
                     if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_name_static"):
-                        self.us1_sat_name_static.update(f"\nSatellite: {self.sat_info_us1['satellitename']}")
+                        self.us1_sat_name_static.update(f"Satellite: {self.sat_info_us1['satellitename']}")
                     if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_storagesum_static"):
-                        self.us1_sat_storagesum_static.update(f"Storage Summary: {self.sat_info_us1['storageSummary']} GB")
+                        self.us1_sat_storagesum_static.update(f"\nStorage Summary: {self.sat_info_us1['storageSummary']} GB")
                     if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_bandwithsum_static"):
                         self.us1_sat_bandwithsum_static.update(f"Bandwith Summary: {self.sat_info_us1['bandwidthSummary']} GB")
                     if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_egresssum_static"):
@@ -857,7 +864,7 @@ Developed by W0lf13 - https://github.com/vvolfie
                     if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_ingresssum_static"):
                         self.us1_sat_ingresssum_static.update(f"Ingress Summary: {self.sat_info_us1['ingressSummary']} GB")
                     if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_disqualified_static"):
-                        self.us1_sat_disqualified_static.update(f"Disqualified Status: {self.sat_info_us1['disqualified']}")
+                        self.us1_sat_disqualified_static.update(f"\nDisqualified Status: {self.sat_info_us1['disqualified']}")
                     if self.current_tab == "sat_us1" and hasattr(self, "us1_sat_suspended_static"):
                         self.us1_sat_suspended_static.update(f"Suspended Status: {self.sat_info_us1['suspended']}")
 
@@ -887,10 +894,10 @@ Developed by W0lf13 - https://github.com/vvolfie
                     # (AP1) labels
                     
                     if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_name_static"):
-                        self.ap1_sat_name_static.update(f"\nSatellite: {self.sat_info_ap1["satellitename"]}")
+                        self.ap1_sat_name_static.update(f"Satellite: {self.sat_info_ap1["satellitename"]}")
 
                     if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_storagesum_static"):
-                        self.ap1_sat_storagesum_static.update(f"Storage Summary: {self.sat_info_ap1["storageSummary"]} GB")
+                        self.ap1_sat_storagesum_static.update(f"\nStorage Summary: {self.sat_info_ap1["storageSummary"]} GB")
                         
                     if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_bandwithsum_static"):
                         self.ap1_sat_bandwithsum_static.update(f"Bandwith Summary: {self.sat_info_ap1["bandwidthSummary"]} GB")
@@ -905,7 +912,7 @@ Developed by W0lf13 - https://github.com/vvolfie
                             self.ap1_sat_ingresssum_static.update(f"Ingress Summary: {self.sat_info_ap1["ingressSummary"]} GB")
                         
                     if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_disqualified_static"):    
-                            self.ap1_sat_disqualified_static.update(f"Disqualified Status: {self.sat_info_ap1["disqualified"]}")
+                            self.ap1_sat_disqualified_static.update(f"\nDisqualified Status: {self.sat_info_ap1["disqualified"]}")
                         
                     if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_suspended_static" ):
                         self.ap1_sat_suspended_static.update(f"Suspended Status: {self.sat_info_ap1["suspended"]}")
@@ -928,6 +935,8 @@ Developed by W0lf13 - https://github.com/vvolfie
                     if self.current_tab == "sat_ap1" and hasattr(self, "ap1_sat_month_ingress_usage_static"):
                         self.ap1_sat_month_ingress_usage_static.update(f"Monthly Ingress Usage: {self.sat_info_ap1["monthly_ingress_usage"]} GB")
 
+                    
+                    
                     ##########################
                     #Payout Labels
 
@@ -935,31 +944,31 @@ Developed by W0lf13 - https://github.com/vvolfie
                         self.payout_egressbandwidth_static.update(f"\nEgress Bandwidth: {self.payout["egressBandwidth"]}")
 
                     if self.current_tab == "payout" and hasattr(self, "payout_egressbandwidthpayout_static"):
-                        self.payout_egressbandwidthpayout_static.update(f"Egress Bandwidth Payout: {self.payout["egressBandwidthPayout"]} USD")
+                        self.payout_egressbandwidthpayout_static.update(f"Egress Bandwidth Payout: {float(self.payout["egressBandwidthPayout"])/100:.2f} USD")
 
                     if self.current_tab == "payout" and hasattr(self, "payout_egressrepairaudit_static"):
                         self.payout_egressrepairaudit_static.update(f"Egress Repair Audit: {self.payout["egressRepairAudit"]}")
 
                     if self.current_tab == "payout" and hasattr(self, "payout_egressrepairauditpayout_static"):
-                        self.payout_egressrepairauditpayout_static.update(f"Egress Repair Audit Payout: {self.payout["egressRepairAuditPayout"]} USD")
+                        self.payout_egressrepairauditpayout_static.update(f"Egress Repair Audit Payout: {float(self.payout["egressRepairAuditPayout"])/100:.2f} USD")
 
                     if self.current_tab == "payout" and hasattr(self, "payout_diskspace_static"):
                         self.payout_diskspace_static.update(f"\nDisk Space: {self.payout["diskSpace"]}")
 
                     if self.current_tab == "payout" and hasattr(self, "payout_diskspacepayout_static"):
-                        self.payout_diskspacepayout_static.update(f"Disk Space Payout: {self.payout["diskSpacePayout"]} USD")
+                        self.payout_diskspacepayout_static.update(f"Disk Space Payout: {float(self.payout["diskSpacePayout"])/100:.2f} USD")
 
                     if self.current_tab == "payout" and hasattr(self, "payout_heldrate_static"):
-                        self.payout_heldrate_static.update(f"\nHeld Rate: {self.payout["heldRate"]}")
+                        self.payout_heldrate_static.update(f"\nHeld Rate: {float(self.payout["heldRate"])/100:.2f}")
 
                     if self.current_tab == "payout" and hasattr(self, "payout_payout_static"):
-                        self.payout_payout_static.update(f"Payout: {self.payout["payout"]} USD")
+                        self.payout_payout_static.update(f"Payout: {float(self.payout["payout"])/100:.2f} USD")
 
                     if self.current_tab == "payout" and hasattr(self, "payout_held_static"):
-                        self.payout_held_static.update(f"Held: {self.payout["held"]} USD")
+                        self.payout_held_static.update(f"Held: {float(self.payout["held"])/100:.2f} USD")
 
                     if self.current_tab == "payout" and hasattr(self, "payout_currentmonthexpectations_static"):
-                        self.payout_currentmonthexpectations_static.update(f"Current Month Expectations: {self.payout["currentMonthExpectations"]} USD")
+                        self.payout_currentmonthexpectations_static.update(f"Current Month Expectations: {float(self.payout["currentMonthExpectations"])/100:.2f} USD")
 
                     ##########################
 

@@ -156,16 +156,16 @@ def parse_storj_metrics(metrics):
                     satellite_info_saltlake["satellitename"] = line.split('url="')[1].split('"')[0]
 
             if "1wFTAgs9DP5RSnCqKV1eLf6N9wtk4EAtmN5DpSxcs8EjT69tGE" in line and "storageSummary" in line:
-                    satellite_info_saltlake["storageSummary"] = line.split()[-1]
+                satellite_info_saltlake["storageSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "1wFTAgs9DP5RSnCqKV1eLf6N9wtk4EAtmN5DpSxcs8EjT69tGE" in line and "bandwidthSummary" in line:
-                    satellite_info_saltlake["bandwidthSummary"] = line.split()[-1]
+                satellite_info_saltlake["bandwidthSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "1wFTAgs9DP5RSnCqKV1eLf6N9wtk4EAtmN5DpSxcs8EjT69tGE" in line and "egressSummary" in line:
-                    satellite_info_saltlake["egressSummary"] = line.split()[-1]
+                satellite_info_saltlake["egressSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "1wFTAgs9DP5RSnCqKV1eLf6N9wtk4EAtmN5DpSxcs8EjT69tGE" in line and "ingressSummary" in line:
-                    satellite_info_saltlake["ingressSummary"] = line.split()[-1]
+                satellite_info_saltlake["ingressSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "1wFTAgs9DP5RSnCqKV1eLf6N9wtk4EAtmN5DpSxcs8EjT69tGE" in line and "disqualified" in line:
                 if (line.split()[-1] == "0.0"):
@@ -185,16 +185,16 @@ def parse_storj_metrics(metrics):
                     satellite_info_ap1["satellitename"] = line.split('url="')[1].split('"')[0]
 
             if "121RTSDpyNZVcEU84Ticf2L1ntiuUimbWgfATz21tuvgk3vzoA6" in line and "storageSummary" in line:
-                    satellite_info_ap1["storageSummary"] = line.split()[-1]
+                satellite_info_ap1["storageSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "121RTSDpyNZVcEU84Ticf2L1ntiuUimbWgfATz21tuvgk3vzoA6" in line and "bandwidthSummary" in line:
-                    satellite_info_ap1["bandwidthSummary"] = line.split()[-1]
+                satellite_info_ap1["bandwidthSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "121RTSDpyNZVcEU84Ticf2L1ntiuUimbWgfATz21tuvgk3vzoA6" in line and "egressSummary" in line:
-                    satellite_info_ap1["egressSummary"] = line.split()[-1]
+                satellite_info_ap1["egressSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "121RTSDpyNZVcEU84Ticf2L1ntiuUimbWgfATz21tuvgk3vzoA6" in line and "ingressSummary" in line:
-                    satellite_info_ap1["ingressSummary"] = line.split()[-1]
+                satellite_info_ap1["ingressSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "121RTSDpyNZVcEU84Ticf2L1ntiuUimbWgfATz21tuvgk3vzoA6" in line and "disqualified" in line:
                 if (line.split()[-1] == "0.0"):
@@ -214,17 +214,16 @@ def parse_storj_metrics(metrics):
                     satellite_info_us1["satellitename"] = line.split('url="')[1].split('"')[0]
 
             if "12EayRS2V1kEsWESU9QMRseFhdxYxKicsiFmxrsLZHeLUtdps3S" in line and "storageSummary" in line:
-                
-                    satellite_info_us1["storageSummary"] = line.split()[-1]
+                satellite_info_us1["storageSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "12EayRS2V1kEsWESU9QMRseFhdxYxKicsiFmxrsLZHeLUtdps3S" in line and "bandwidthSummary" in line:
-                    satellite_info_us1["bandwidthSummary"] = line.split()[-1]
+                satellite_info_us1["bandwidthSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "12EayRS2V1kEsWESU9QMRseFhdxYxKicsiFmxrsLZHeLUtdps3S" in line and "egressSummary" in line:
-                    satellite_info_us1["egressSummary"] = line.split()[-1]
+                satellite_info_us1["egressSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "12EayRS2V1kEsWESU9QMRseFhdxYxKicsiFmxrsLZHeLUtdps3S" in line and "ingressSummary" in line:
-                    satellite_info_us1["ingressSummary"] = line.split()[-1]
+                satellite_info_us1["ingressSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "12EayRS2V1kEsWESU9QMRseFhdxYxKicsiFmxrsLZHeLUtdps3S" in line and "disqualified" in line:
                 if (line.split()[-1] == "0.0"):
@@ -244,16 +243,16 @@ def parse_storj_metrics(metrics):
                     satellite_info_eu1["satellitename"] = line.split('url="')[1].split('"')[0]
 
             if "12L9ZFwhzVpuEKMUNUqkaTLGzwY9G24tbiigLiXpmZWKwmcNDDs" in line and "storageSummary" in line:
-                    satellite_info_eu1["storageSummary"] = line.split()[-1]
+                satellite_info_eu1["storageSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "12L9ZFwhzVpuEKMUNUqkaTLGzwY9G24tbiigLiXpmZWKwmcNDDs" in line and "bandwidthSummary" in line:
-                    satellite_info_eu1["bandwidthSummary"] = line.split()[-1]
+                satellite_info_eu1["bandwidthSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "12L9ZFwhzVpuEKMUNUqkaTLGzwY9G24tbiigLiXpmZWKwmcNDDs" in line and "egressSummary" in line:
-                    satellite_info_eu1["egressSummary"] = line.split()[-1]
+                satellite_info_eu1["egressSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "12L9ZFwhzVpuEKMUNUqkaTLGzwY9G24tbiigLiXpmZWKwmcNDDs" in line and "ingressSummary" in line:
-                    satellite_info_eu1["ingressSummary"] = line.split()[-1]
+                satellite_info_eu1["ingressSummary"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
 
             if "12L9ZFwhzVpuEKMUNUqkaTLGzwY9G24tbiigLiXpmZWKwmcNDDs" in line and "disqualified" in line:
                 if (line.split()[-1] == "0.0"):
@@ -272,60 +271,137 @@ def parse_storj_metrics(metrics):
             #Repair
             if 'type="repair"' in line:
                 if "saltlake" in line:
-                    satellite_info_saltlake["monthly_egress_repair"] = line.split()[-1]
+                    try:
+                        satellite_info_saltlake["monthly_egress_repair"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_saltlake["monthly_egress_repair"] = line.split()[-1]
                 elif "ap1" in line:
-                    satellite_info_ap1["monthly_egress_repair"] = line.split()[-1]
+                    try:
+                        satellite_info_ap1["monthly_egress_repair"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_ap1["monthly_egress_repair"] = line.split()[-1]
                 elif "us1" in line:
-                    satellite_info_us1["monthly_egress_repair"] = line.split()[-1]
+                    try:
+                        satellite_info_us1["monthly_egress_repair"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_us1["monthly_egress_repair"] = line.split()[-1]
                 elif "eu1" in line:
-                    satellite_info_eu1["monthly_egress_repair"] = line.split()[-1]
-            
+                    try:
+                        satellite_info_eu1["monthly_egress_repair"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_eu1["monthly_egress_repair"] = line.split()[-1]
             #Audit
             if 'type="audit"' in line:
                 if "saltlake" in line:
-                    satellite_info_saltlake["monthly_egress_audit"] = line.split()[-1]
+                    try:
+                        satellite_info_saltlake["monthly_egress_audit"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_saltlake["monthly_egress_audit"] = line.split()[-1]
                 elif "ap1" in line:
-                    satellite_info_ap1["monthly_egress_audit"] = line.split()[-1]
+                    try:
+                        satellite_info_ap1["monthly_egress_audit"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_ap1["monthly_egress_audit"] = line.split()[-1]
                 elif "us1" in line:
-                    satellite_info_us1["monthly_egress_audit"] = line.split()[-1]
+                    try:
+                        satellite_info_us1["monthly_egress_audit"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_us1["monthly_egress_audit"] = line.split()[-1]
                 elif "eu1" in line:
-                    satellite_info_eu1["monthly_egress_audit"] = line.split()[-1]
-
+                    try:
+                        satellite_info_eu1["monthly_egress_audit"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_eu1["monthly_egress_audit"] = line.split()[-1]
             #Usage
             if 'type="usage"' in line:
                 if "saltlake" in line:
-                    satellite_info_saltlake["monthly_egress_usage"] = line.split()[-1]
+                    try:
+                        satellite_info_saltlake["monthly_egress_usage"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_saltlake["monthly_egress_usage"] = line.split()[-1]
                 elif "ap1" in line:
-                    satellite_info_ap1["monthly_egress_usage"] = line.split()[-1]
+                    try:
+                        satellite_info_ap1["monthly_egress_usage"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_ap1["monthly_egress_usage"] = line.split()[-1]
                 elif "us1" in line:
-                    satellite_info_us1["monthly_egress_usage"] = line.split()[-1]
+                    try:
+                        satellite_info_us1["monthly_egress_usage"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_us1["monthly_egress_usage"] = line.split()[-1]
                 elif "eu1" in line:
-                    satellite_info_eu1["monthly_egress_usage"] = line.split()[-1]
-
+                    try:
+                        satellite_info_eu1["monthly_egress_usage"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_eu1["monthly_egress_usage"] = line.split()[-1]
         #Monthly Ingress
         if "storj_sat_month_ingress" in line:
             #Repair
             if 'type="repair"' in line:
                 if "saltlake" in line:
-                    satellite_info_saltlake["monthly_ingress_repair"] = line.split()[-1]
+                    try:
+                        satellite_info_saltlake["monthly_ingress_repair"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_saltlake["monthly_ingress_repair"] = line.split()[-1]
                 elif "ap1" in line:
-                    satellite_info_ap1["monthly_ingress_repair"] = line.split()[-1]
+                    try:
+                        satellite_info_ap1["monthly_ingress_repair"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_ap1["monthly_ingress_repair"] = line.split()[-1]
                 elif "us1" in line:
-                    satellite_info_us1["monthly_ingress_repair"] = line.split()[-1]
+                    try:
+                        satellite_info_us1["monthly_ingress_repair"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_us1["monthly_ingress_repair"] = line.split()[-1]
                 elif "eu1" in line:
-                    satellite_info_eu1["monthly_ingress_repair"] = line.split()[-1]
-            
-
+                    try:
+                        satellite_info_eu1["monthly_ingress_repair"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_eu1["monthly_ingress_repair"] = line.split()[-1]
+            #Audit
+            if 'type="audit"' in line:
+                if "saltlake" in line:
+                    try:
+                        satellite_info_saltlake["monthly_ingress_audit"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_saltlake["monthly_ingress_audit"] = line.split()[-1]
+                elif "ap1" in line:
+                    try:
+                        satellite_info_ap1["monthly_ingress_audit"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_ap1["monthly_ingress_audit"] = line.split()[-1]
+                elif "us1" in line:
+                    try:
+                        satellite_info_us1["monthly_ingress_audit"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_us1["monthly_ingress_audit"] = line.split()[-1]
+                elif "eu1" in line:
+                    try:
+                        satellite_info_eu1["monthly_ingress_audit"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_eu1["monthly_ingress_audit"] = line.split()[-1]
             #Usage
             if 'type="usage"' in line:
                 if "saltlake" in line:
-                    satellite_info_saltlake["monthly_ingress_usage"] = line.split()[-1]
+                    try:
+                        satellite_info_saltlake["monthly_ingress_usage"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_saltlake["monthly_ingress_usage"] = line.split()[-1]
                 elif "ap1" in line:
-                    satellite_info_ap1["monthly_ingress_usage"] = line.split()[-1]
+                    try:
+                        satellite_info_ap1["monthly_ingress_usage"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_ap1["monthly_ingress_usage"] = line.split()[-1]
                 elif "us1" in line:
-                    satellite_info_us1["monthly_ingress_usage"] = line.split()[-1]
+                    try:
+                        satellite_info_us1["monthly_ingress_usage"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_us1["monthly_ingress_usage"] = line.split()[-1]
                 elif "eu1" in line:
-                    satellite_info_eu1["monthly_ingress_usage"] = line.split()[-1]
+                    try:
+                        satellite_info_eu1["monthly_ingress_usage"] = f"{float(line.split()[-1]) / (1024**3):.2f}"
+                    except:
+                        satellite_info_eu1["monthly_ingress_usage"] = line.split()[-1]
 
         # Payout
         if "storj_payout_currentMonth" in line:
